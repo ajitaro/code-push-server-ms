@@ -1,10 +1,14 @@
 {
     "compilerOptions": {
       "module": "commonjs",
+      "moduleResolution": "node",
       "noImplicitAny": false,
       "target": "ES2022",
       "outDir": "./bin",
       "skipLibCheck": true,
+      "declaration": true,
+      "strict": true,
+      "resolveJsonModule": true
     },
     "exclude": [
       "./bin",

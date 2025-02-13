@@ -8,7 +8,7 @@ import * as figlet from "figlet";
 import backslash = require("backslash");
 import parseDuration = require("parse-duration");
 
-const packageJson = require("../../package.json");
+const packageJson = require(require.resolve("../../package.json"));
 const ROLLOUT_PERCENTAGE_REGEX: RegExp = /^(100|[1-9][0-9]|[1-9])%?$/;
 const USAGE_PREFIX = "Usage: rupush";
 
