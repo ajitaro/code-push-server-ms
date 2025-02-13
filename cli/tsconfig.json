@@ -8,7 +8,8 @@
       "skipLibCheck": true,
       "declaration": true,
       "strict": true,
-      "resolveJsonModule": true
+      "resolveJsonModule": true,
+      "esModuleInterop": true
     },
     "exclude": [
       "./bin",

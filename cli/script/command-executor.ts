@@ -52,7 +52,7 @@ import {
 
 const configFilePath: string = path.join(process.env.LOCALAPPDATA || process.env.HOME, ".code-push.config");
 const emailValidator = require("email-validator");
-const packageJson = require(require.resolve("../../package.json"));
+import packageJson from "../package.json";
 const parseXml = Q.denodeify(require("xml2js").parseString);
 import Promise = Q.Promise;
 import { Organization } from "./types/rest-definitions";

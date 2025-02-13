@@ -7,8 +7,8 @@ import * as chalk from "chalk";
 import * as figlet from "figlet";
 import backslash = require("backslash");
 import parseDuration = require("parse-duration");
+import packageJson from "../package.json";
 
-const packageJson = require(require.resolve("../../package.json"));
 const ROLLOUT_PERCENTAGE_REGEX: RegExp = /^(100|[1-9][0-9]|[1-9])%?$/;
 const USAGE_PREFIX = "Usage: rupush";
 

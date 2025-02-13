@@ -30,7 +30,7 @@ import {
 import { IAppAddCommand } from "./types/cli";
 import { Organization } from "./types/rest-definitions";
 
-const packageJson = require(require.resolve("../../package.json"));
+import packageJson from "../package.json";
 
 interface JsonResponse {
   headers: Headers;
