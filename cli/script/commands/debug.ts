@@ -3,9 +3,9 @@
 
 import * as childProcess from "child_process";
 import * as cli from "../../script/types/cli";
-import * as moment from "moment";
+import moment from "moment";
 import * as path from "path";
-import * as Q from "q";
+import Q from "q";
 
 const simctl = require("simctl");
 const which = require("which");
