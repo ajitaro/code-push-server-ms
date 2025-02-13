@@ -4,12 +4,13 @@
 import * as yargs from "yargs";
 import * as cli from "../script/types/cli";
 import * as chalk from "chalk";
+import * as figlet from "figlet";
 import backslash = require("backslash");
 import parseDuration = require("parse-duration");
 
 const packageJson = require("../../package.json");
 const ROLLOUT_PERCENTAGE_REGEX: RegExp = /^(100|[1-9][0-9]|[1-9])%?$/;
-const USAGE_PREFIX = "Usage: code-push-standalone";
+const USAGE_PREFIX = "Usage: rupush";
 
 // Command categories are:  access-key, app, release, deployment, deployment-key, login, logout, register
 let isValidCommandCategory = false;
@@ -20,13 +21,11 @@ let wasHelpShown = false;
 export function showHelp(showRootDescription?: boolean): void {
   if (!wasHelpShown) {
     if (showRootDescription) {
-      console.log(chalk.cyan("  _____        __  " + chalk.green("  ___           __ ")));
-      console.log(chalk.cyan(" / ___/__  ___/ /__" + chalk.green(" / _ \\__ _____ / / ")));
-      console.log(chalk.cyan("/ /__/ _ \\/ _  / -_)" + chalk.green(" ___/ // (_-</ _ \\")));
-      console.log(chalk.cyan("\\___/\\___/\\_,_/\\__/" + chalk.green("_/   \\_,_/___/_//_/")) + "    CLI v" + packageJson.version);
+      console.log(chalk.cyan(figlet.textSync("RuPush", { horizontalLayout: "full", font: "Big" })));
+      console.log(chalk.cyan("v" + packageJson.version))
       console.log(chalk.cyan("======================================"));
       console.log("");
-      console.log("CodePush is a service that enables you to deploy mobile app updates directly to your users' devices.\n");
+      console.log("CodePush CLI with organization support.\n");
     }
 
     yargs.showHelp();
@@ -149,10 +148,10 @@ function appRemove(commandName: string, yargs: yargs.Argv): void {
 function listCollaborators(commandName: string, yargs: yargs.Argv): void {
   isValidCommand = true;
   yargs
-    .usage(USAGE_PREFIX + " collaborator " + commandName + " <appName> [options]")
-    .demand(/*count*/ 1, /*max*/ 1) // Require exactly one non-option arguments
-    .example("collaborator " + commandName + " MyApp", 'Lists the collaborators for app "MyApp" in tabular format')
-    .example("collaborator " + commandName + " MyApp --format json", 'Lists the collaborators for app "MyApp" in JSON format')
+    .usage(USAGE_PREFIX + " collaborator " + commandName + " <organization> <appName> [options]")
+    .demand(/*count*/ 2, /*max*/ 2) // Require exactly one non-option arguments
+    .example("collaborator " + commandName + " MyOrg MyApp", 'Lists the collaborators for app "MyApp" in tabular format')
+    .example("collaborator " + commandName + " MyOrg MyApp --format json", 'Lists the collaborators for app "MyApp" in JSON format')
     .option("format", {
       default: "table",
       demand: false,
@@ -166,9 +165,9 @@ function listCollaborators(commandName: string, yargs: yargs.Argv): void {
 function removeCollaborator(commandName: string, yargs: yargs.Argv): void {
   isValidCommand = true;
   yargs
-    .usage(USAGE_PREFIX + " collaborator " + commandName + " <appName> <email>")
-    .demand(/*count*/ 2, /*max*/ 2) // Require exactly two non-option arguments
-    .example("collaborator " + commandName + " MyApp foo@bar.com", 'Removes foo@bar.com as a collaborator from app "MyApp"');
+    .usage(USAGE_PREFIX + " collaborator " + commandName + " <organization> <appName> <email>")
+    .demand(/*count*/ 3, /*max*/ 3) // Require exactly two non-option arguments
+    .example("collaborator " + commandName + " MyOrg MyApp foo@bar.com", 'Removes foo@bar.com as a collaborator from app "MyApp"');
 
   addCommonConfiguration(yargs);
 }
@@ -216,10 +215,10 @@ function deploymentHistoryClear(commandName: string, yargs: yargs.Argv): void {
 function deploymentList(commandName: string, yargs: yargs.Argv): void {
   isValidCommand = true;
   yargs
-    .usage(USAGE_PREFIX + " deployment " + commandName + " <appName> [options]")
-    .demand(/*count*/ 1, /*max*/ 1) // Require exactly one non-option arguments
-    .example("deployment " + commandName + " MyApp", 'Lists the deployments for app "MyApp" in tabular format')
-    .example("deployment " + commandName + " MyApp --format json", 'Lists the deployments for app "MyApp" in JSON format')
+    .usage(USAGE_PREFIX + " deployment " + commandName + " <organization> <appName> [options]")
+    .demand(/*count*/ 2, /*max*/ 2) // Require exactly one non-option arguments
+    .example("deployment " + commandName + " MyOrganization MyApp", 'Lists the deployments for app "MyApp" in tabular format')
+    .example("deployment " + commandName + " MyOrganization MyApp --format json", 'Lists the deployments for app "MyApp" in JSON format')
     .option("format", {
       default: "table",
       demand: false,
@@ -302,9 +301,9 @@ yargs
       .command("add", "Add a new app to your account", (yargs: yargs.Argv): void => {
         isValidCommand = true;
         yargs
-          .usage(USAGE_PREFIX + " app add <appName>")
-          .demand(/*count*/ 1, /*max*/ 1) // Require exactly one non-option arguments
-          .example("app add MyApp", 'Adds app "MyApp"');
+          .usage(USAGE_PREFIX + " app add <organization> <appName> <os>")
+          .demand(/*count*/ 3, /*max*/ 3) // Require exactly one non-option arguments
+          .example("app add myorg myapp-android android", 'Adds app "myapp-android" to organization "myorg"');
 
         addCommonConfiguration(yargs);
       })
@@ -341,9 +340,9 @@ yargs
       .command("add", "Add a new collaborator to an app", (yargs: yargs.Argv): void => {
         isValidCommand = true;
         yargs
-          .usage(USAGE_PREFIX + " collaborator add <appName> <email>")
-          .demand(/*count*/ 2, /*max*/ 2) // Require exactly two non-option arguments
-          .example("collaborator add MyApp foo@bar.com", 'Adds foo@bar.com as a collaborator to app "MyApp"');
+          .usage(USAGE_PREFIX + " collaborator add <organization> <appName> <email>")
+          .demand(/*count*/ 3, /*max*/ 3) // Require exactly two non-option arguments
+          .example("collaborator add MyOrg MyApp foo@bar.com", 'Adds foo@bar.com as a collaborator to app "MyApp"');
 
         addCommonConfiguration(yargs);
       })
@@ -445,6 +444,31 @@ yargs
       .example("logout", "Logs out and ends your current session");
     addCommonConfiguration(yargs);
   })
+  .command("organization", "Manage organizations", (yargs: yargs.Argv) => {
+    isValidCommandCategory = true;
+    yargs
+      .usage(USAGE_PREFIX + " organization <command>")
+      .demand(/*count*/ 2, /*max*/ 2) // Require exactly two non-option arguments.
+      .command("add", "Add a new organization", (yargs: yargs.Argv) => {
+        isValidCommand = true;
+        yargs
+          .usage(USAGE_PREFIX + " organization add <organization>")
+          .demand(/*count*/ 1, /*max*/ 1) // Require exactly one non-option arguments
+          .example("organization add MyOrg", 'Adds organization "MyOrg"');
+
+        addCommonConfiguration(yargs);
+      })
+      .command("ls", "List the organizations", (yargs: yargs.Argv) => {
+        isValidCommand = true;
+        yargs
+          .usage(USAGE_PREFIX + " organization ls")
+          .demand(/*count*/ 0, /*max*/ 0) //set 'max' to one to allow usage of serverUrl undocument parameter for testing
+          .example("organization ls", "Lists the organizations");
+        addCommonConfiguration(yargs);
+      })
+      .check((argv: any, aliases: { [aliases: string]: string }): any => isValidCommand); // Report unrecognized, non-hyphenated command category.
+    addCommonConfiguration(yargs);
+  })
   .command("patch", "Update the metadata for an existing release", (yargs: yargs.Argv) => {
     yargs
       .usage(USAGE_PREFIX + " patch <appName> <deploymentName> [options]")
@@ -508,14 +532,14 @@ yargs
   })
   .command("promote", "Promote the latest release from one app deployment to another", (yargs: yargs.Argv) => {
     yargs
-      .usage(USAGE_PREFIX + " promote <appName> <sourceDeploymentName> <destDeploymentName> [options]")
-      .demand(/*count*/ 3, /*max*/ 3) // Require exactly three non-option arguments
+      .usage(USAGE_PREFIX + " promote <organization> <appName> <sourceDeploymentName> <destDeploymentName> [options]")
+      .demand(/*count*/ 4, /*max*/ 4) // Require exactly three non-option arguments
       .example(
-        "promote MyApp Staging Production",
+        "promote MyOrganization MyApp Staging Production",
         'Promotes the latest release within the "Staging" deployment of "MyApp" to "Production"'
       )
       .example(
-        'promote MyApp Staging Production --des "Production rollout" -r 25',
+        'promote MyOrganization MyApp Staging Production --des "Production rollout" -r 25',
         'Promotes the latest release within the "Staging" deployment of "MyApp" to "Production", with an updated description, and targeting only 25% of the users'
       )
       .option("description", {
@@ -654,18 +678,18 @@ yargs
   })
   .command("release-react", "Release a React Native update to an app deployment", (yargs: yargs.Argv) => {
     yargs
-      .usage(USAGE_PREFIX + " release-react <appName> <platform> [options]")
-      .demand(/*count*/ 2, /*max*/ 2) // Require exactly two non-option arguments
+      .usage(USAGE_PREFIX + " release-react <organization> <appName> <platform> [options]")
+      .demand(/*count*/ 3, /*max*/ 3) // Require exactly two non-option arguments
       .example(
-        "release-react MyApp ios",
+        "release-react  MyOrg MyApp ios",
         'Releases the React Native iOS project in the current working directory to the "MyApp" app\'s "Staging" deployment'
       )
       .example(
-        "release-react MyApp android -d Production",
+        "release-react MyOrg MyApp android -d Production",
         'Releases the React Native Android project in the current working directory to the "MyApp" app\'s "Production" deployment'
       )
       .example(
-        "release-react MyApp windows --dev",
+        "release-react MyOrg MyApp windows --dev",
         'Releases the development bundle of the React Native Windows project in the current working directory to the "MyApp" app\'s "Staging" deployment'
       )
       .option("bundleName", {
@@ -947,10 +971,14 @@ export function createCommand(): cli.ICommand {
       case "app":
         switch (arg1) {
           case "add":
-            if (arg2) {
+            if (arg2 && arg3 && arg4) {
               cmd = { type: cli.CommandType.appAdd };
 
-              (<cli.IAppAddCommand>cmd).appName = arg2;
+              const appAddCommand = <cli.IAppAddCommand>cmd;
+
+              appAddCommand.orgName = arg2;
+              appAddCommand.appName = arg3;
+              appAddCommand.os = arg4;
             }
             break;
 
@@ -997,21 +1025,27 @@ export function createCommand(): cli.ICommand {
       case "collaborator":
         switch (arg1) {
           case "add":
-            if (arg2 && arg3) {
+            if (arg2 && arg3 && arg4) {
               cmd = { type: cli.CommandType.collaboratorAdd };
 
-              (<cli.ICollaboratorAddCommand>cmd).appName = arg2;
-              (<cli.ICollaboratorAddCommand>cmd).email = arg3;
+              const collaboratorAddCommand = <cli.ICollaboratorAddCommand>cmd;
+
+              collaboratorAddCommand.orgName = arg2;
+              collaboratorAddCommand.appName = arg3;
+              collaboratorAddCommand.email = arg4;
             }
             break;
 
           case "list":
           case "ls":
-            if (arg2) {
+            if (arg2 && arg3) {
               cmd = { type: cli.CommandType.collaboratorList };
 
-              (<cli.ICollaboratorListCommand>cmd).appName = arg2;
-              (<cli.ICollaboratorListCommand>cmd).format = argv["format"] as any;
+              const collaboratorListCommand = <cli.ICollaboratorListCommand>cmd;
+
+              collaboratorListCommand.orgName = arg2;
+              collaboratorListCommand.appName = arg3;
+              collaboratorListCommand.format = argv["format"] as any;
             }
             break;
 
@@ -1061,12 +1095,13 @@ export function createCommand(): cli.ICommand {
 
           case "list":
           case "ls":
-            if (arg2) {
+            if (arg2 && arg3) {
               cmd = { type: cli.CommandType.deploymentList };
 
               const deploymentListCommand = <cli.IDeploymentListCommand>cmd;
 
-              deploymentListCommand.appName = arg2;
+              deploymentListCommand.orgName = arg2;
+              deploymentListCommand.appName = arg3;
               deploymentListCommand.format = argv["format"] as any;
               deploymentListCommand.displayKeys = argv["displayKeys"] as any;
             }
@@ -1132,6 +1167,23 @@ export function createCommand(): cli.ICommand {
         cmd = { type: cli.CommandType.logout };
         break;
 
+      case "organization":
+        switch (arg1) {
+          case "add":
+            if (arg2) {
+              cmd = { type: cli.CommandType.organizationAdd };
+              const organizationCommand = <cli.IOrganizationCommand>cmd;
+              organizationCommand.orgName = arg2;
+            }
+            break;
+
+          case "list":
+          case "ls":
+            cmd = { type: cli.CommandType.organizationList };
+            break;
+        }
+        break;
+
       case "patch":
         if (arg1 && arg2) {
           cmd = { type: cli.CommandType.patch };
@@ -1151,14 +1203,15 @@ export function createCommand(): cli.ICommand {
         break;
 
       case "promote":
-        if (arg1 && arg2 && arg3) {
+        if (arg1 && arg2 && arg3 && arg4) {
           cmd = { type: cli.CommandType.promote };
 
           const deploymentPromoteCommand = <cli.IPromoteCommand>cmd;
 
-          deploymentPromoteCommand.appName = arg1;
-          deploymentPromoteCommand.sourceDeploymentName = arg2;
-          deploymentPromoteCommand.destDeploymentName = arg3;
+          deploymentPromoteCommand.orgName = arg1;
+          deploymentPromoteCommand.appName = arg2;
+          deploymentPromoteCommand.sourceDeploymentName = arg3;
+          deploymentPromoteCommand.destDeploymentName = arg4;
           deploymentPromoteCommand.description = argv["description"] ? backslash(argv["description"]) : "";
           deploymentPromoteCommand.label = argv["label"] as any;
           deploymentPromoteCommand.disabled = argv["disabled"] as any;
@@ -1196,13 +1249,14 @@ export function createCommand(): cli.ICommand {
         break;
 
       case "release-react":
-        if (arg1 && arg2) {
+        if (arg1 && arg2 && arg3) {
           cmd = { type: cli.CommandType.releaseReact };
 
           const releaseReactCommand = <cli.IReleaseReactCommand>cmd;
 
-          releaseReactCommand.appName = arg1;
-          releaseReactCommand.platform = arg2;
+          releaseReactCommand.orgName = arg1;
+          releaseReactCommand.appName = arg2;
+          releaseReactCommand.platform = arg3;
 
           releaseReactCommand.appStoreVersion = argv["targetBinaryVersion"] as any;
           releaseReactCommand.bundleName = argv["bundleName"] as any;
@@ -1265,7 +1319,6 @@ export function createCommand(): cli.ICommand {
         cmd = { type: cli.CommandType.whoami };
         break;
     }
-
     return cmd;
   }
 }

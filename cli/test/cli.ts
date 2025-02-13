@@ -120,6 +120,8 @@ export class SdkStub {
     return Q([
       <codePush.App>{
         name: "a",
+        os: "android",
+        orgName: "orgA",
         collaborators: {
           "a@a.com": { permission: "Owner", isCurrentAccount: true },
         },
@@ -127,6 +129,8 @@ export class SdkStub {
       },
       <codePush.App>{
         name: "b",
+        os: "ios",
+        orgName: "orgB",
         collaborators: {
           "a@a.com": { permission: "Owner", isCurrentAccount: true },
         },
@@ -471,6 +475,7 @@ describe("CLI", () => {
       appName: "a",
       os: "",
       platform: "",
+      orgName: "",
     };
 
     var addApp: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "addApp");
@@ -528,6 +533,7 @@ describe("CLI", () => {
     var command: cli.IAppRemoveCommand = {
       type: cli.CommandType.appRemove,
       appName: "a",
+      orgName: "MyOrganization",
     };
 
     var removeApp: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "removeApp");
@@ -546,6 +552,7 @@ describe("CLI", () => {
     var command: cli.IAppRemoveCommand = {
       type: cli.CommandType.appRemove,
       appName: "a",
+      orgName: "MyOrganization",
     };
 
     var removeApp: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "removeApp");
@@ -566,6 +573,7 @@ describe("CLI", () => {
       type: cli.CommandType.appRename,
       currentAppName: "a",
       newAppName: "c",
+      orgName: "MyOrganization",
     };
 
     var renameApp: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "renameApp");
@@ -584,6 +592,7 @@ describe("CLI", () => {
       type: cli.CommandType.appTransfer,
       appName: "a",
       email: "b@b.com",
+      orgName: "MyOrganization",
     };
 
     var transferApp: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "transferApp");
@@ -602,6 +611,7 @@ describe("CLI", () => {
       type: cli.CommandType.collaboratorAdd,
       appName: "a",
       email: "b@b.com",
+      orgName: "MyOrganization",
     };
 
     var addCollaborator: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "addCollaborator");
@@ -620,6 +630,7 @@ describe("CLI", () => {
       type: cli.CommandType.collaboratorList,
       appName: "a",
       format: "json",
+      orgName: "MyOrganization",
     };
 
     cmdexec.execute(command).done((): void => {
@@ -644,6 +655,7 @@ describe("CLI", () => {
       type: cli.CommandType.collaboratorRemove,
       appName: "a",
       email: "b@b.com",
+      orgName: "MyOrganization",
     };
 
     var removeCollaborator: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "removeCollaborator");
@@ -663,6 +675,7 @@ describe("CLI", () => {
       appName: "a",
       deploymentName: "b",
       default: false,
+      orgName: "MyOrganization",
     };
 
     var addDeployment: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "addDeployment");
@@ -680,6 +693,7 @@ describe("CLI", () => {
       type: cli.CommandType.deploymentHistoryClear,
       appName: "a",
       deploymentName: "Staging",
+      orgName: "MyOrganization",
     };
 
     var clearDeployment: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "clearDeploymentHistory");
@@ -702,6 +716,7 @@ describe("CLI", () => {
       type: cli.CommandType.deploymentHistoryClear,
       appName: "a",
       deploymentName: "Staging",
+      orgName: "MyOrganization",
     };
 
     var clearDeployment: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "clearDeploymentHistory");
@@ -723,6 +738,7 @@ describe("CLI", () => {
       appName: "a",
       format: "json",
       displayKeys: true,
+      orgName: "MyOrganization",
     };
 
     cmdexec.execute(command).done((): void => {
@@ -768,6 +784,7 @@ describe("CLI", () => {
       type: cli.CommandType.deploymentRemove,
       appName: "a",
       deploymentName: "Staging",
+      orgName: "MyOrganization",
     };
 
     var removeDeployment: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "removeDeployment");
@@ -787,6 +804,7 @@ describe("CLI", () => {
       type: cli.CommandType.deploymentRemove,
       appName: "a",
       deploymentName: "Staging",
+      orgName: "MyOrganization",
     };
 
     var removeDeployment: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "removeDeployment");
@@ -808,6 +826,7 @@ describe("CLI", () => {
       appName: "a",
       currentDeploymentName: "Staging",
       newDeploymentName: "c",
+      orgName: "MyOrganization",
     };
 
     var renameDeployment: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "renameDeployment");
@@ -828,6 +847,7 @@ describe("CLI", () => {
       deploymentName: "Staging",
       format: "json",
       displayAuthor: false,
+      orgName: "MyOrganization",
     };
 
     var getDeploymentHistory: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "getDeploymentHistory");
@@ -877,6 +897,7 @@ describe("CLI", () => {
       mandatory: true,
       rollout: 25,
       appStoreVersion: "1.0.1",
+      orgName: "MyOrganization",
     };
 
     var patch: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "patchRelease");
@@ -901,6 +922,7 @@ describe("CLI", () => {
       mandatory: true,
       rollout: 25,
       appStoreVersion: "1.0.1",
+      orgName: "MyOrganization",
     };
 
     var patch: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "patchRelease");
@@ -925,6 +947,7 @@ describe("CLI", () => {
       mandatory: true,
       rollout: 25,
       appStoreVersion: null,
+      orgName: "MyOrganization",
     };
 
     var patch: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "patchRelease");
@@ -949,6 +972,7 @@ describe("CLI", () => {
       mandatory: null,
       rollout: null,
       appStoreVersion: null,
+      orgName: "MyOrganization",
     };
 
     var patch: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "patchRelease");
@@ -976,6 +1000,7 @@ describe("CLI", () => {
       mandatory: true,
       rollout: 25,
       appStoreVersion: "1.0.1",
+      orgName: "MyOrganization",
     };
 
     var promote: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "promote");
@@ -1002,6 +1027,7 @@ describe("CLI", () => {
       mandatory: true,
       rollout: 25,
       appStoreVersion: null,
+      orgName: "MyOrganization",
     };
 
     var promote: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "promote");
@@ -1047,6 +1073,7 @@ describe("CLI", () => {
       rollout: null,
       appStoreVersion: "not semver",
       package: "./resources",
+      orgName: "MyOrganization",
     };
 
     releaseHelperFunction(
@@ -1066,6 +1093,7 @@ describe("CLI", () => {
       rollout: null,
       appStoreVersion: "1.0.0",
       package: "/fake/path/test/file.zip",
+      orgName: "MyOrganization",
     };
 
     releaseHelperFunction(command, done, INVALID_RELEASE_FILE_ERROR_MESSAGE);
@@ -1081,6 +1109,7 @@ describe("CLI", () => {
       rollout: null,
       appStoreVersion: "1.0.0",
       package: "/fake/path/test/file.ipa",
+      orgName: "MyOrganization",
     };
 
     releaseHelperFunction(command, done, INVALID_RELEASE_FILE_ERROR_MESSAGE);
@@ -1096,6 +1125,7 @@ describe("CLI", () => {
       rollout: null,
       appStoreVersion: "1.0.0",
       package: "/fake/path/test/file.apk",
+      orgName: "MyOrganization",
     };
 
     releaseHelperFunction(command, done, INVALID_RELEASE_FILE_ERROR_MESSAGE);
@@ -1111,6 +1141,7 @@ describe("CLI", () => {
       mandatory: false,
       rollout: null,
       platform: "ios",
+      orgName: "MyOrganization",
     };
 
     var release: sinon.SinonSpy = sandbox.spy(cmdexec, "release");
@@ -1143,6 +1174,7 @@ describe("CLI", () => {
       mandatory: false,
       rollout: null,
       platform: "ios",
+      orgName: "MyOrganization",
     };
 
     ensureInTestAppDirectory();
@@ -1173,6 +1205,7 @@ describe("CLI", () => {
       mandatory: false,
       rollout: null,
       platform: "blackberry",
+      orgName: "MyOrganization",
     };
 
     ensureInTestAppDirectory();
@@ -1206,6 +1239,7 @@ describe("CLI", () => {
       rollout: null,
       platform: "android",
       sourcemapOutput: "index.android.js.map",
+      orgName: "MyOrganization",
     };
 
     ensureInTestAppDirectory();
@@ -1238,6 +1272,7 @@ describe("CLI", () => {
       mandatory: false,
       rollout: null,
       platform: "ios",
+      orgName: "MyOrganization",
     };
 
     ensureInTestAppDirectory();
@@ -1278,6 +1313,7 @@ describe("CLI", () => {
       mandatory: false,
       rollout: null,
       platform: "ios",
+      orgName: "MyOrganization",
     };
 
     ensureInTestAppDirectory();
@@ -1324,6 +1360,7 @@ describe("CLI", () => {
       mandatory: false,
       rollout: null,
       platform: "android",
+      orgName: "MyOrganization",
     };
 
     ensureInTestAppDirectory();
@@ -1370,6 +1407,7 @@ describe("CLI", () => {
       mandatory: false,
       rollout: null,
       platform: "windows",
+      orgName: "MyOrganization",
     };
 
     ensureInTestAppDirectory();
@@ -1420,6 +1458,7 @@ describe("CLI", () => {
       rollout: null,
       platform: "android",
       sourcemapOutput: "index.android.js.map",
+      orgName: "MyOrganization",
     };
 
     ensureInTestAppDirectory();
@@ -1467,6 +1506,7 @@ describe("CLI", () => {
       rollout: null,
       platform: "android",
       sourcemapOutput: "index.android.js.map",
+      orgName: "MyOrganization",
     };
 
     ensureInTestAppDirectory();
@@ -1514,6 +1554,7 @@ describe("CLI", () => {
       rollout: null,
       platform: "android",
       sourcemapOutput: "index.android.js.map",
+      orgName: "MyOrganization",
     };
 
     ensureInTestAppDirectory();
@@ -1559,6 +1600,7 @@ describe("CLI", () => {
       mandatory: false,
       rollout: null,
       platform: "ios",
+      orgName: "MyOrganization",
     };
 
     ensureInTestAppDirectory();

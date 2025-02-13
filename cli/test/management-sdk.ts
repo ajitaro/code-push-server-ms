@@ -5,6 +5,7 @@ import * as assert from "assert";
 import * as Q from "q";
 
 import AccountManager = require("../script/management-sdk");
+import { CommandType, IAppAddCommand } from "../script/types/cli";
 
 var request = require("superagent");
 
@@ -123,11 +124,19 @@ describe("Management SDK", () => {
     );
   });
 
+  const command: IAppAddCommand = {
+    appName: "appName",
+    os: "os",
+    platform: "platform",
+    orgName: "orgName",
+    type: CommandType.accessKeyAdd
+  }
+
   it("addApp handles successful response", (done: Mocha.Done) => {
     mockReturn(JSON.stringify({ success: true }), 201, {
       location: "/appName",
     });
-    manager.addApp("appName").done((obj) => {
+    manager.addApp(command).done((obj) => {
       assert.ok(obj);
       done();
     }, rejectHandler);
@@ -135,7 +144,7 @@ describe("Management SDK", () => {
 
   it("addApp handles error response", (done: Mocha.Done) => {
     mockReturn(JSON.stringify({ success: false }), 404, {});
-    manager.addApp("appName").done(
+    manager.addApp(command).done(
       (obj) => {
         throw new Error("Call should not complete successfully");
       },
@@ -146,7 +155,7 @@ describe("Management SDK", () => {
   it("getApp handles JSON response", (done: Mocha.Done) => {
     mockReturn(JSON.stringify({ app: {} }), 200, {});
 
-    manager.getApp("appName").done((obj: any) => {
+    manager.getApp("appName", "orgName").done((obj: any) => {
       assert.ok(obj);
       done();
     }, rejectHandler);
@@ -155,7 +164,7 @@ describe("Management SDK", () => {
   it("updateApp handles success response", (done: Mocha.Done) => {
     mockReturn(JSON.stringify({ apps: [] }), 200, {});
 
-    manager.renameApp("appName", "newAppName").done((obj: any) => {
+    manager.renameApp("appName", "newAppName", "orgName").done((obj: any) => {
       assert.ok(!obj);
       done();
     }, rejectHandler);
@@ -164,7 +173,7 @@ describe("Management SDK", () => {
   it("removeApp handles success response", (done: Mocha.Done) => {
     mockReturn("", 200, {});
 
-    manager.removeApp("appName").done((obj: any) => {
+    manager.removeApp("appName", "orgName").done((obj: any) => {
       assert.ok(!obj);
       done();
     }, rejectHandler);
@@ -172,7 +181,7 @@ describe("Management SDK", () => {
 
   it("transferApp handles successful response", (done: Mocha.Done) => {
     mockReturn("", 201);
-    manager.transferApp("appName", "email1").done((obj: any) => {
+    manager.transferApp("appName", "email1", "orgName").done((obj: any) => {
       assert.ok(!obj);
       done();
     }, rejectHandler);
@@ -181,7 +190,7 @@ describe("Management SDK", () => {
   it("addDeployment handles success response", (done: Mocha.Done) => {
     mockReturn(JSON.stringify({ deployment: { name: "name", key: "key" } }), 201, { location: "/deploymentName" });
 
-    manager.addDeployment("appName", "deploymentName").done((obj: any) => {
+    manager.addDeployment("appName", "deploymentName", "orgName").done((obj: any) => {
       assert.ok(obj);
       done();
     }, rejectHandler);
@@ -190,7 +199,7 @@ describe("Management SDK", () => {
   it("getDeployment handles JSON response", (done: Mocha.Done) => {
     mockReturn(JSON.stringify({ deployment: {} }), 200, {});
 
-    manager.getDeployment("appName", "deploymentName").done((obj: any) => {
+    manager.getDeployment("appName", "deploymentName", "orgName").done((obj: any) => {
       assert.ok(obj);
       done();
     }, rejectHandler);
@@ -199,7 +208,7 @@ describe("Management SDK", () => {
   it("getDeployments handles JSON response", (done: Mocha.Done) => {
     mockReturn(JSON.stringify({ deployments: [] }), 200, {});
 
-    manager.getDeployments("appName").done((obj: any) => {
+    manager.getDeployments("appName", "orgName").done((obj: any) => {
       assert.ok(obj);
       done();
     }, rejectHandler);
@@ -208,7 +217,7 @@ describe("Management SDK", () => {
   it("renameDeployment handles success response", (done: Mocha.Done) => {
     mockReturn(JSON.stringify({ apps: [] }), 200, {});
 
-    manager.renameDeployment("appName", "deploymentName", "newDeploymentName").done((obj: any) => {
+    manager.renameDeployment("appName", "deploymentName", "newDeploymentName", "orgName").done((obj: any) => {
       assert.ok(!obj);
       done();
     }, rejectHandler);
@@ -217,7 +226,7 @@ describe("Management SDK", () => {
   it("removeDeployment handles success response", (done: Mocha.Done) => {
     mockReturn("", 200, {});
 
-    manager.removeDeployment("appName", "deploymentName").done((obj: any) => {
+    manager.removeDeployment("appName", "deploymentName", "orgName").done((obj: any) => {
       assert.ok(!obj);
       done();
     }, rejectHandler);
@@ -226,7 +235,7 @@ describe("Management SDK", () => {
   it("getDeploymentHistory handles success response with no packages", (done: Mocha.Done) => {
     mockReturn(JSON.stringify({ history: [] }), 200);
 
-    manager.getDeploymentHistory("appName", "deploymentName").done((obj: any) => {
+    manager.getDeploymentHistory("appName", "deploymentName", "orgName").done((obj: any) => {
       assert.ok(obj);
       assert.equal(obj.length, 0);
       done();
@@ -236,7 +245,7 @@ describe("Management SDK", () => {
   it("getDeploymentHistory handles success response with two packages", (done: Mocha.Done) => {
     mockReturn(JSON.stringify({ history: [{ label: "v1" }, { label: "v2" }] }), 200);
 
-    manager.getDeploymentHistory("appName", "deploymentName").done((obj: any) => {
+    manager.getDeploymentHistory("appName", "deploymentName", "orgName").done((obj: any) => {
       assert.ok(obj);
       assert.equal(obj.length, 2);
       assert.equal(obj[0].label, "v1");
@@ -248,7 +257,7 @@ describe("Management SDK", () => {
   it("getDeploymentHistory handles error response", (done: Mocha.Done) => {
     mockReturn("", 404);
 
-    manager.getDeploymentHistory("appName", "deploymentName").done(
+    manager.getDeploymentHistory("appName", "deploymentName", "orgName").done(
       (obj: any) => {
         throw new Error("Call should not complete successfully");
       },
@@ -259,7 +268,7 @@ describe("Management SDK", () => {
   it("clearDeploymentHistory handles success response", (done: Mocha.Done) => {
     mockReturn("", 204);
 
-    manager.clearDeploymentHistory("appName", "deploymentName").done((obj: any) => {
+    manager.clearDeploymentHistory("appName", "deploymentName", "orgName").done((obj: any) => {
       assert.ok(!obj);
       done();
     }, rejectHandler);
@@ -268,7 +277,7 @@ describe("Management SDK", () => {
   it("clearDeploymentHistory handles error response", (done: Mocha.Done) => {
     mockReturn("", 404);
 
-    manager.clearDeploymentHistory("appName", "deploymentName").done(
+    manager.clearDeploymentHistory("appName", "deploymentName", "orgName").done(
       (obj: any) => {
         throw new Error("Call should not complete successfully");
       },
@@ -278,7 +287,7 @@ describe("Management SDK", () => {
 
   it("addCollaborator handles successful response", (done: Mocha.Done) => {
     mockReturn("", 201, { location: "/collaborators" });
-    manager.addCollaborator("appName", "email1").done((obj: any) => {
+    manager.addCollaborator("appName", "email1", "orgName").done((obj: any) => {
       assert.ok(!obj);
       done();
     }, rejectHandler);
@@ -286,7 +295,7 @@ describe("Management SDK", () => {
 
   it("addCollaborator handles error response", (done: Mocha.Done) => {
     mockReturn("", 404, {});
-    manager.addCollaborator("appName", "email1").done(
+    manager.addCollaborator("appName", "email1", "orgName").done(
       (obj) => {
         throw new Error("Call should not complete successfully");
       },
@@ -297,7 +306,7 @@ describe("Management SDK", () => {
   it("getCollaborators handles success response with no collaborators", (done: Mocha.Done) => {
     mockReturn(JSON.stringify({ collaborators: {} }), 200);
 
-    manager.getCollaborators("appName").done((obj: any) => {
+    manager.getCollaborators("appName", "orgName").done((obj: any) => {
       assert.ok(obj);
       assert.equal(Object.keys(obj).length, 0);
       done();
@@ -315,7 +324,7 @@ describe("Management SDK", () => {
       200
     );
 
-    manager.getCollaborators("appName").done((obj: any) => {
+    manager.getCollaborators("appName", "orgName").done((obj: any) => {
       assert.ok(obj);
       assert.equal(obj["email1"].permission, "Owner");
       assert.equal(obj["email2"].permission, "Collaborator");
@@ -326,7 +335,7 @@ describe("Management SDK", () => {
   it("removeCollaborator handles success response", (done: Mocha.Done) => {
     mockReturn("", 200, {});
 
-    manager.removeCollaborator("appName", "email1").done((obj: any) => {
+    manager.removeCollaborator("appName", "email1", "orgName").done((obj: any) => {
       assert.ok(!obj);
       done();
     }, rejectHandler);
@@ -338,7 +347,7 @@ describe("Management SDK", () => {
     manager
       .patchRelease("appName", "deploymentName", "label", {
         description: "newDescription",
-      })
+      }, "orgName")
       .done((obj: any) => {
         assert.ok(!obj);
         done();
@@ -348,7 +357,7 @@ describe("Management SDK", () => {
   it("patchRelease handles error response", (done: Mocha.Done) => {
     mockReturn("", 400);
 
-    manager.patchRelease("appName", "deploymentName", "label", {}).done(
+    manager.patchRelease("appName", "deploymentName", "label", {}, "orgName").done(
       (obj: any) => {
         throw new Error("Call should not complete successfully");
       },
@@ -362,7 +371,7 @@ describe("Management SDK", () => {
     manager
       .promote("appName", "deploymentName", "newDeploymentName", {
         description: "newDescription",
-      })
+      }, "orgName")
       .done((obj: any) => {
         assert.ok(!obj);
         done();
@@ -373,9 +382,7 @@ describe("Management SDK", () => {
     mockReturn("", 400);
 
     manager
-      .promote("appName", "deploymentName", "newDeploymentName", {
-        rollout: 123,
-      })
+      .promote("appName", "deploymentName", "newDeploymentName", { rollout: 123 }, "orgName")
       .done(
         (obj: any) => {
           throw new Error("Call should not complete successfully");

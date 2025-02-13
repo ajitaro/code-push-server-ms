@@ -96,6 +96,11 @@ export interface Account {
   linkedProviders: string[];
 }
 
+export interface Organization {
+  orgName: string;
+  name: string;
+}
+
 /*out*/
 export interface CollaboratorProperties {
   isCurrentAccount?: boolean;
@@ -111,6 +116,8 @@ export interface CollaboratorMap {
 export interface App {
   /*generated*/ collaborators?: CollaboratorMap;
   /*key*/ name: string;
+  os: string;
+  orgName: string;
   /*generated*/ deployments?: string[];
 }
 

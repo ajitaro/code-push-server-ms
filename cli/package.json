@@ -6,12 +6,13 @@
   "scripts": {
     "start": "node ./bin/script/cli.js",
     "build": "tsc",
+    "dev:tsc": "tsc --watch",
     "prettier": "prettier --write \"./**/*.ts\"",
     "lint": "npx eslint ./script/**/*.ts",
     "lint:fix": "npx eslint ./script/**/*.ts --fix"
   },
   "bin": {
-    "code-push-standalone": "./bin/script/cli.js"
+    "rupush": "./bin/script/cli.js"
   },
   "repository": {
     "type": "git",
@@ -21,8 +22,10 @@
   "dependencies": {
     "backslash": "^0.2.0",
     "chalk": "^4.1.2",
+    "cli-spinner": "^0.2.10",
     "cli-table": "^0.3.11",
     "email-validator": "^2.0.4",
+    "figlet": "^1.8.0",
     "gradle-to-js": "2.0.1",
     "jsonwebtoken": "^9.0.2",
     "moment": "^2.29.4",
@@ -49,6 +52,7 @@
   },
   "devDependencies": {
     "@types/express": "^4.17.17",
+    "@types/figlet": "^1.7.0",
     "@types/jest": "^29.5.2",
     "@types/mocha": "^10.0.1",
     "@types/node": "^20.3.1",

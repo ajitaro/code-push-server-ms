@@ -55,7 +55,9 @@ const emailValidator = require("email-validator");
 const packageJson = require("../../package.json");
 const parseXml = Q.denodeify(require("xml2js").parseString);
 import Promise = Q.Promise;
+import { Organization } from "./types/rest-definitions";
 const properties = require("properties");
+const Spinner = require("cli-spinner").Spinner;
 
 const CLI_HEADERS: Headers = {
   "X-CodePush-CLI-Version": packageJson.version,
@@ -175,13 +177,14 @@ function accessKeyRemove(command: cli.IAccessKeyRemoveCommand): Promise<void> {
 }
 
 function appAdd(command: cli.IAppAddCommand): Promise<void> {
-  return sdk.addApp(command.appName).then((app: App): Promise<void> => {
+  return sdk.addApp(command).then((app: App): Promise<void> => {
     log('Successfully added the "' + command.appName + '" app, along with the following default deployments:');
     const deploymentListCommand: cli.IDeploymentListCommand = {
       type: cli.CommandType.deploymentList,
       appName: app.name,
       format: "table",
       displayKeys: true,
+      orgName: command.orgName,
     };
     return deploymentList(deploymentListCommand, /*showPackage=*/ false);
   });
@@ -199,7 +202,7 @@ function appRemove(command: cli.IAppRemoveCommand): Promise<void> {
   return confirm("Are you sure you want to remove this app? Note that its deployment keys will be PERMANENTLY unrecoverable.").then(
     (wasConfirmed: boolean): Promise<void> => {
       if (wasConfirmed) {
-        return sdk.removeApp(command.appName).then((): void => {
+        return sdk.removeApp(command.appName, command.orgName).then((): void => {
           log('Successfully removed the "' + command.appName + '" app.');
         });
       }
@@ -210,7 +213,7 @@ function appRemove(command: cli.IAppRemoveCommand): Promise<void> {
 }
 
 function appRename(command: cli.IAppRenameCommand): Promise<void> {
-  return sdk.renameApp(command.currentAppName, command.newAppName).then((): void => {
+  return sdk.renameApp(command.currentAppName, command.newAppName, command.orgName).then((): void => {
     log('Successfully renamed the "' + command.currentAppName + '" app to "' + command.newAppName + '".');
   });
 }
@@ -226,7 +229,7 @@ function appTransfer(command: cli.IAppTransferCommand): Promise<void> {
 
   return confirm().then((wasConfirmed: boolean): Promise<void> => {
     if (wasConfirmed) {
-      return sdk.transferApp(command.appName, command.email).then((): void => {
+      return sdk.transferApp(command.appName, command.email, command.orgName).then((): void => {
         log(
           'Successfully transferred the ownership of app "' + command.appName + '" to the account with email "' + command.email + '".'
         );
@@ -240,7 +243,7 @@ function appTransfer(command: cli.IAppTransferCommand): Promise<void> {
 function addCollaborator(command: cli.ICollaboratorAddCommand): Promise<void> {
   throwForInvalidEmail(command.email);
 
-  return sdk.addCollaborator(command.appName, command.email).then((): void => {
+  return sdk.addCollaborator(command.appName, command.email, command.orgName).then((): void => {
     log('Successfully added "' + command.email + '" as a collaborator to the app "' + command.appName + '".');
   });
 }
@@ -248,7 +251,7 @@ function addCollaborator(command: cli.ICollaboratorAddCommand): Promise<void> {
 function listCollaborators(command: cli.ICollaboratorListCommand): Promise<void> {
   throwForInvalidOutputFormat(command.format);
 
-  return sdk.getCollaborators(command.appName).then((retrievedCollaborators: CollaboratorMap): void => {
+  return sdk.getCollaborators(command.appName, command.orgName).then((retrievedCollaborators: CollaboratorMap): void => {
     printCollaboratorsList(command.format, retrievedCollaborators);
   });
 }
@@ -258,7 +261,7 @@ function removeCollaborator(command: cli.ICollaboratorRemoveCommand): Promise<vo
 
   return confirm().then((wasConfirmed: boolean): Promise<void> => {
     if (wasConfirmed) {
-      return sdk.removeCollaborator(command.appName, command.email).then((): void => {
+      return sdk.removeCollaborator(command.appName, command.email, command.orgName).then((): void => {
         log('Successfully removed "' + command.email + '" as a collaborator from the app "' + command.appName + '".');
       });
     }
@@ -290,7 +293,7 @@ function deleteFolder(folderPath: string): Promise<void> {
 }
 
 function deploymentAdd(command: cli.IDeploymentAddCommand): Promise<void> {
-  return sdk.addDeployment(command.appName, command.deploymentName).then((deployment: Deployment): void => {
+  return sdk.addDeployment(command.appName, command.deploymentName, command.orgName).then((deployment: Deployment): void => {
     log(
       'Successfully added the "' +
         command.deploymentName +
@@ -306,7 +309,7 @@ function deploymentAdd(command: cli.IDeploymentAddCommand): Promise<void> {
 function deploymentHistoryClear(command: cli.IDeploymentHistoryClearCommand): Promise<void> {
   return confirm().then((wasConfirmed: boolean): Promise<void> => {
     if (wasConfirmed) {
-      return sdk.clearDeploymentHistory(command.appName, command.deploymentName).then((): void => {
+      return sdk.clearDeploymentHistory(command.appName, command.deploymentName, command.orgName).then((): void => {
         log(
           'Successfully cleared the release history associated with the "' +
             command.deploymentName +
@@ -326,13 +329,13 @@ export const deploymentList = (command: cli.IDeploymentListCommand, showPackage:
   let deployments: Deployment[];
 
   return sdk
-    .getDeployments(command.appName)
+    .getDeployments(command.appName, command.orgName)
     .then((retrievedDeployments: Deployment[]) => {
       deployments = retrievedDeployments;
       if (showPackage) {
         const metricsPromises: Promise<void>[] = deployments.map((deployment: Deployment) => {
           if (deployment.package) {
-            return sdk.getDeploymentMetrics(command.appName, deployment.name).then((metrics: DeploymentMetrics): void => {
+            return sdk.getDeploymentMetrics(command.appName, deployment.name, command.orgName).then((metrics: DeploymentMetrics): void => {
               if (metrics[deployment.package.label]) {
                 const totalActive: number = getTotalActiveFromDeploymentMetrics(metrics);
                 (<PackageWithMetrics>deployment.package).metrics = {
@@ -362,7 +365,7 @@ function deploymentRemove(command: cli.IDeploymentRemoveCommand): Promise<void> 
     "Are you sure you want to remove this deployment? Note that its deployment key will be PERMANENTLY unrecoverable."
   ).then((wasConfirmed: boolean): Promise<void> => {
     if (wasConfirmed) {
-      return sdk.removeDeployment(command.appName, command.deploymentName).then((): void => {
+      return sdk.removeDeployment(command.appName, command.deploymentName, command.orgName).then((): void => {
         log('Successfully removed the "' + command.deploymentName + '" deployment from the "' + command.appName + '" app.');
       });
     }
@@ -372,7 +375,7 @@ function deploymentRemove(command: cli.IDeploymentRemoveCommand): Promise<void> 
 }
 
 function deploymentRename(command: cli.IDeploymentRenameCommand): Promise<void> {
-  return sdk.renameDeployment(command.appName, command.currentDeploymentName, command.newDeploymentName).then((): void => {
+  return sdk.renameDeployment(command.appName, command.currentDeploymentName, command.newDeploymentName, command.orgName).then((): void => {
     log(
       'Successfully renamed the "' +
         command.currentDeploymentName +
@@ -390,8 +393,8 @@ function deploymentHistory(command: cli.IDeploymentHistoryCommand): Promise<void
 
   return Q.all<any>([
     sdk.getAccountInfo(),
-    sdk.getDeploymentHistory(command.appName, command.deploymentName),
-    sdk.getDeploymentMetrics(command.appName, command.deploymentName),
+    sdk.getDeploymentHistory(command.appName, command.deploymentName, command.orgName),
+    sdk.getDeploymentMetrics(command.appName, command.deploymentName, command.orgName),
   ]).spread<void>((account: Account, deploymentHistory: Package[], metrics: DeploymentMetrics): void => {
     const totalActive: number = getTotalActiveFromDeploymentMetrics(metrics);
     deploymentHistory.forEach((packageObject: Package) => {
@@ -454,7 +457,7 @@ export function execute(command: cli.ICommand) {
 
         if (!connectionInfo) {
           throw new Error(
-            "You are not currently logged in. Run the 'code-push-standalone login' command to authenticate with the CodePush server."
+            "You are not currently logged in. Run the 'rupush login' command to authenticate with the CodePush server."
           );
         }
 
@@ -528,6 +531,12 @@ export function execute(command: cli.ICommand) {
 
       case cli.CommandType.logout:
         return logout(command);
+
+      case cli.CommandType.organizationAdd:
+        return organizationAdd(<cli.IOrganizationCommand>command);
+
+      case cli.CommandType.organizationList:
+        return organizationList();
 
       case cli.CommandType.patch:
         return patch(<cli.IPatchCommand>command);
@@ -643,6 +652,30 @@ function logout(command: cli.ICommand): Promise<void> {
       sdk = null;
       deleteConnectionInfoCache();
     });
+}
+
+function organizationAdd(command: cli.IOrganizationCommand): Promise<void> {
+  return sdk.addOrganizations(command.orgName).then((org: Organization): void => {
+    log('Successfully added the "' + command.orgName + '" organization.');
+  });
+}
+
+function organizationList(): Promise<void> {
+  return sdk.isAuthenticated(true)
+    .then((isAuth: boolean): Promise<void> => {
+      if (!isAuth) {
+        throw new Error("Not authenticated.");
+      }
+      
+      return sdk.getOrganizations().then((organizations: Organization[]): void => {
+        printTable(["No", "Name"], (dataSource: any[]): void => {
+          organizations.forEach((org: Organization, index: number) => {
+            dataSource.push([index + 1, org.name])
+          });
+        });
+      });
+    })
+    .catch((err: CodePushError) => console.warn(chalk.red("[Error] " + err.message)));
 }
 
 function formatDate(unixOffset: number): string {
@@ -1165,7 +1198,7 @@ function promote(command: cli.IPromoteCommand): Promise<void> {
   };
 
   return sdk
-    .promote(command.appName, command.sourceDeploymentName, command.destDeploymentName, packageInfo)
+    .promote(command.appName, command.sourceDeploymentName, command.destDeploymentName, packageInfo, command.orgName)
     .then((): void => {
       log(
         "Successfully promoted " +
@@ -1193,7 +1226,7 @@ function patch(command: cli.IPatchCommand): Promise<void> {
 
   for (const updateProperty in packageInfo) {
     if ((<any>packageInfo)[updateProperty] !== null) {
-      return sdk.patchRelease(command.appName, command.deploymentName, command.label, packageInfo).then((): void => {
+      return sdk.patchRelease(command.appName, command.deploymentName, command.label, packageInfo, command.orgName).then((): void => {
         log(
           `Successfully updated the "${command.label ? command.label : `latest`}" release of "${command.appName}" app's "${
             command.deploymentName
@@ -1244,7 +1277,7 @@ export const release = (command: cli.IReleaseCommand): Promise<void> => {
   return sdk
     .isAuthenticated(true)
     .then((isAuth: boolean): Promise<void> => {
-      return sdk.release(command.appName, command.deploymentName, filePath, command.appStoreVersion, updateMetadata, uploadProgress);
+      return sdk.release(command.appName, command.deploymentName, filePath, command.appStoreVersion, updateMetadata, command.orgName, uploadProgress);
     })
     .then((): void => {
       log(
@@ -1272,7 +1305,7 @@ export const releaseReact = (command: cli.IReleaseReactCommand): Promise<void> =
   // This validation helps to save about 1 minute or more in case user has typed wrong app or deployment name.
   return (
     sdk
-      .getDeployment(command.appName, command.deploymentName)
+      .getDeployment(command.appName, command.deploymentName, command.orgName)
       .then((): any => {
         releaseCommand.package = outputFolder;
 
@@ -1474,19 +1507,25 @@ export const runReactNativeBundleCommand = (
   log(`node ${reactNativeBundleArgs.join(" ")}`);
 
   return Promise<void>((resolve, reject, notify) => {
+    const spinner = new Spinner({ text: 'Bundling: %s' });
+    spinner.setSpinnerString(18);
+    spinner.start();
+
     reactNativeBundleProcess.stdout.on("data", (data: Buffer) => {
-      log(data.toString().trim());
+      log('\n' + data.toString().trim());
     });
 
     reactNativeBundleProcess.stderr.on("data", (data: Buffer) => {
-      console.error(data.toString().trim());
+      console.error('\n' + data.toString().trim());
     });
 
     reactNativeBundleProcess.on("close", (exitCode: number) => {
       if (exitCode) {
+        spinner.stop(true);
         reject(new Error(`"react-native bundle" command exited with code ${exitCode}.`));
       }
 
+      spinner.stop(true);
       resolve(<void>null);
     });
   });
@@ -1521,7 +1560,7 @@ function sessionList(command: cli.ISessionListCommand): Promise<void> {
 
 function sessionRemove(command: cli.ISessionRemoveCommand): Promise<void> {
   if (os.hostname() === command.machineName) {
-    throw new Error("Cannot remove the current login session via this command. Please run 'code-push-standalone logout' instead.");
+    throw new Error("Cannot remove the current login session via this command. Please run 'rupush logout' instead.");
   } else {
     return confirm().then((wasConfirmed: boolean): Promise<void> => {
       if (wasConfirmed) {
