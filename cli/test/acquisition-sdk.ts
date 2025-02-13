@@ -9,16 +9,16 @@ import * as acquisitionSdk from "../script/acquisition-sdk";
 import * as mockApi from "./acquisition-rest-mock";
 import * as rest from "../script/types/rest-definitions";
 
-var latestPackage: rest.UpdateCheckResponse = clone(mockApi.latestPackage);
+const latestPackage: rest.UpdateCheckResponse = clone(mockApi.latestPackage);
 
-var configuration: acquisitionSdk.Configuration = {
+const configuration: acquisitionSdk.Configuration = {
   appVersion: "1.5.0",
   clientUniqueId: "My iPhone",
   deploymentKey: mockApi.validDeploymentKey,
   serverUrl: mockApi.serverUrl,
 };
 
-var templateCurrentPackage: acquisitionSdk.Package = {
+const templateCurrentPackage: acquisitionSdk.Package = {
   deploymentKey: mockApi.validDeploymentKey,
   description: "sdfsdf",
   label: "v1",
@@ -28,7 +28,7 @@ var templateCurrentPackage: acquisitionSdk.Package = {
   packageSize: 100,
 };
 
-var scriptUpdateResult: acquisitionSdk.RemotePackage = {
+const scriptUpdateResult: acquisitionSdk.RemotePackage = {
   deploymentKey: mockApi.validDeploymentKey,
   description: latestPackage.description,
   downloadUrl: latestPackage.downloadURL,
@@ -39,14 +39,14 @@ var scriptUpdateResult: acquisitionSdk.RemotePackage = {
   packageSize: latestPackage.packageSize,
 };
 
-var nativeUpdateResult: acquisitionSdk.NativeUpdateNotification = {
+const nativeUpdateResult: acquisitionSdk.NativeUpdateNotification = {
   updateAppVersion: true,
   appVersion: latestPackage.appVersion,
 };
 
 describe("Acquisition SDK", () => {
   it("Package with lower label and different package hash gives update", (done: Mocha.Done) => {
-    var acquisition = new acquisitionSdk.AcquisitionManager(new mockApi.HttpRequester(), configuration);
+    const acquisition = new acquisitionSdk.AcquisitionManager(new mockApi.HttpRequester(), configuration);
     acquisition.queryUpdateWithCurrentPackage(
       templateCurrentPackage,
       (error: Error, returnPackage: acquisitionSdk.RemotePackage | acquisitionSdk.NativeUpdateNotification) => {
@@ -58,10 +58,10 @@ describe("Acquisition SDK", () => {
   });
 
   it("Package with equal package hash gives no update", (done: Mocha.Done) => {
-    var equalVersionPackage: acquisitionSdk.Package = clone(templateCurrentPackage);
+    const equalVersionPackage: acquisitionSdk.Package = clone(templateCurrentPackage);
     equalVersionPackage.packageHash = latestPackage.packageHash;
 
-    var acquisition = new acquisitionSdk.AcquisitionManager(new mockApi.HttpRequester(), configuration);
+    const acquisition = new acquisitionSdk.AcquisitionManager(new mockApi.HttpRequester(), configuration);
     acquisition.queryUpdateWithCurrentPackage(
       equalVersionPackage,
       (error: Error, returnPackage: acquisitionSdk.RemotePackage | acquisitionSdk.NativeUpdateNotification) => {
@@ -73,10 +73,10 @@ describe("Acquisition SDK", () => {
   });
 
   it("Package with higher different hash and higher label version gives update", (done: Mocha.Done) => {
-    var higherVersionPackage: acquisitionSdk.Package = clone(templateCurrentPackage);
+    const higherVersionPackage: acquisitionSdk.Package = clone(templateCurrentPackage);
     higherVersionPackage.packageHash = "hash990";
 
-    var acquisition = new acquisitionSdk.AcquisitionManager(new mockApi.HttpRequester(), configuration);
+    const acquisition = new acquisitionSdk.AcquisitionManager(new mockApi.HttpRequester(), configuration);
     acquisition.queryUpdateWithCurrentPackage(
       higherVersionPackage,
       (error: Error, returnPackage: acquisitionSdk.RemotePackage | acquisitionSdk.NativeUpdateNotification) => {
@@ -88,10 +88,10 @@ describe("Acquisition SDK", () => {
   });
 
   it("Package with lower native version gives update notification", (done: Mocha.Done) => {
-    var lowerAppVersionPackage: acquisitionSdk.Package = clone(templateCurrentPackage);
+    const lowerAppVersionPackage: acquisitionSdk.Package = clone(templateCurrentPackage);
     lowerAppVersionPackage.appVersion = "0.0.1";
 
-    var acquisition = new acquisitionSdk.AcquisitionManager(new mockApi.HttpRequester(), configuration);
+    const acquisition = new acquisitionSdk.AcquisitionManager(new mockApi.HttpRequester(), configuration);
     acquisition.queryUpdateWithCurrentPackage(
       lowerAppVersionPackage,
       (error: Error, returnPackage: acquisitionSdk.RemotePackage | acquisitionSdk.NativeUpdateNotification) => {
@@ -103,10 +103,10 @@ describe("Acquisition SDK", () => {
   });
 
   it("Package with higher native version gives no update", (done: Mocha.Done) => {
-    var higherAppVersionPackage: acquisitionSdk.Package = clone(templateCurrentPackage);
+    const higherAppVersionPackage: acquisitionSdk.Package = clone(templateCurrentPackage);
     higherAppVersionPackage.appVersion = "9.9.0";
 
-    var acquisition = new acquisitionSdk.AcquisitionManager(new mockApi.HttpRequester(), configuration);
+    const acquisition = new acquisitionSdk.AcquisitionManager(new mockApi.HttpRequester(), configuration);
     acquisition.queryUpdateWithCurrentPackage(
       higherAppVersionPackage,
       (error: Error, returnPackage: acquisitionSdk.RemotePackage | acquisitionSdk.NativeUpdateNotification) => {
@@ -118,15 +118,15 @@ describe("Acquisition SDK", () => {
   });
 
   it("An empty response gives no update", (done: Mocha.Done) => {
-    var lowerAppVersionPackage: acquisitionSdk.Package = clone(templateCurrentPackage);
+    const lowerAppVersionPackage: acquisitionSdk.Package = clone(templateCurrentPackage);
     lowerAppVersionPackage.appVersion = "0.0.1";
 
-    var emptyReponse: acquisitionSdk.Http.Response = {
+    const emptyReponse: acquisitionSdk.Http.Response = {
       statusCode: 200,
       body: JSON.stringify({}),
     };
 
-    var acquisition = new acquisitionSdk.AcquisitionManager(new mockApi.CustomResponseHttpRequester(emptyReponse), configuration);
+    const acquisition = new acquisitionSdk.AcquisitionManager(new mockApi.CustomResponseHttpRequester(emptyReponse), configuration);
     acquisition.queryUpdateWithCurrentPackage(
       lowerAppVersionPackage,
       (error: Error, returnPackage: acquisitionSdk.RemotePackage | acquisitionSdk.NativeUpdateNotification) => {
@@ -137,15 +137,15 @@ describe("Acquisition SDK", () => {
   });
 
   it("An unexpected (but valid) JSON response gives no update", (done: Mocha.Done) => {
-    var lowerAppVersionPackage: acquisitionSdk.Package = clone(templateCurrentPackage);
+    const lowerAppVersionPackage: acquisitionSdk.Package = clone(templateCurrentPackage);
     lowerAppVersionPackage.appVersion = "0.0.1";
 
-    var unexpectedResponse: acquisitionSdk.Http.Response = {
+    const unexpectedResponse: acquisitionSdk.Http.Response = {
       statusCode: 200,
       body: JSON.stringify({ unexpected: "response" }),
     };
 
-    var acquisition = new acquisitionSdk.AcquisitionManager(
+    const acquisition = new acquisitionSdk.AcquisitionManager(
       new mockApi.CustomResponseHttpRequester(unexpectedResponse),
       configuration
     );
@@ -159,13 +159,13 @@ describe("Acquisition SDK", () => {
   });
 
   it("Package for companion app ignores high native version and gives update", (done: Mocha.Done) => {
-    var higherAppVersionCompanionPackage: acquisitionSdk.Package = clone(templateCurrentPackage);
+    const higherAppVersionCompanionPackage: acquisitionSdk.Package = clone(templateCurrentPackage);
     higherAppVersionCompanionPackage.appVersion = "9.9.0";
 
-    var companionAppConfiguration = clone(configuration);
+    const companionAppConfiguration = clone(configuration);
     configuration.ignoreAppVersion = true;
 
-    var acquisition = new acquisitionSdk.AcquisitionManager(new mockApi.HttpRequester(), configuration);
+    const acquisition = new acquisitionSdk.AcquisitionManager(new mockApi.HttpRequester(), configuration);
     acquisition.queryUpdateWithCurrentPackage(
       higherAppVersionCompanionPackage,
       (error: Error, returnPackage: acquisitionSdk.RemotePackage | acquisitionSdk.NativeUpdateNotification) => {
@@ -179,7 +179,7 @@ describe("Acquisition SDK", () => {
   it("If latest package is mandatory, returned package is mandatory", (done: Mocha.Done) => {
     mockApi.latestPackage.isMandatory = true;
 
-    var acquisition = new acquisitionSdk.AcquisitionManager(new mockApi.HttpRequester(), configuration);
+    const acquisition = new acquisitionSdk.AcquisitionManager(new mockApi.HttpRequester(), configuration);
     acquisition.queryUpdateWithCurrentPackage(templateCurrentPackage, (error: Error, returnPackage: acquisitionSdk.RemotePackage) => {
       assert.equal(null, error);
       assert.equal(true, returnPackage.isMandatory);
@@ -188,10 +188,10 @@ describe("Acquisition SDK", () => {
   });
 
   it("If invalid arguments are provided, an error is raised", (done: Mocha.Done) => {
-    var invalidPackage: acquisitionSdk.Package = clone(templateCurrentPackage);
+    const invalidPackage: acquisitionSdk.Package = clone(templateCurrentPackage);
     invalidPackage.appVersion = null;
 
-    var acquisition = new acquisitionSdk.AcquisitionManager(new mockApi.HttpRequester(), configuration);
+    const acquisition = new acquisitionSdk.AcquisitionManager(new mockApi.HttpRequester(), configuration);
     try {
       acquisition.queryUpdateWithCurrentPackage(
         invalidPackage,
@@ -206,15 +206,15 @@ describe("Acquisition SDK", () => {
   });
 
   it("If an invalid JSON response is returned by the server, an error is raised", (done: Mocha.Done) => {
-    var lowerAppVersionPackage: acquisitionSdk.Package = clone(templateCurrentPackage);
+    const lowerAppVersionPackage: acquisitionSdk.Package = clone(templateCurrentPackage);
     lowerAppVersionPackage.appVersion = "0.0.1";
 
-    var invalidJsonReponse: acquisitionSdk.Http.Response = {
+    const invalidJsonReponse: acquisitionSdk.Http.Response = {
       statusCode: 200,
       body: "invalid {{ json",
     };
 
-    var acquisition = new acquisitionSdk.AcquisitionManager(
+    const acquisition = new acquisitionSdk.AcquisitionManager(
       new mockApi.CustomResponseHttpRequester(invalidJsonReponse),
       configuration
     );
@@ -233,7 +233,7 @@ describe("Acquisition SDK", () => {
   });
 
   it("reportStatusDeploy(...) signals completion", (done: Mocha.Done): void => {
-    var acquisition = new acquisitionSdk.AcquisitionManager(new mockApi.HttpRequester(), configuration);
+    const acquisition = new acquisitionSdk.AcquisitionManager(new mockApi.HttpRequester(), configuration);
 
     acquisition.reportStatusDeploy(
       templateCurrentPackage,
@@ -253,7 +253,7 @@ describe("Acquisition SDK", () => {
   });
 
   it("reportStatusDownload(...) signals completion", (done: Mocha.Done): void => {
-    var acquisition = new acquisitionSdk.AcquisitionManager(new mockApi.HttpRequester(), configuration);
+    const acquisition = new acquisitionSdk.AcquisitionManager(new mockApi.HttpRequester(), configuration);
 
     acquisition.reportStatusDownload(templateCurrentPackage, (error: Error, parameter: void): void => {
       if (error) {

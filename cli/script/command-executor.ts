@@ -453,7 +453,7 @@ export function execute(command: cli.ICommand) {
 
       // Must be logged in
       default:
-        if (!!sdk) break; // Used by unit tests to skip authentication
+        if (sdk) break; // Used by unit tests to skip authentication
 
         if (!connectionInfo) {
           throw new Error(

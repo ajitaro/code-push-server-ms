@@ -1,11 +1,15 @@
 {
+    "root": true,
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
-        "ecmaVersion": "2022",
+        "ecmaVersion": 2022,
         "sourceType": "module",
-        "project": "./tsconfig.json"
+        "project": ["./tsconfig.json"],
+        "tsconfigRootDir": "./"
     },
     "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/recommended"
     ],
     "ignorePatterns": ["**/bin/**", "tsup.config.js"],
     "rules": {
@@ -13,6 +17,7 @@
         "prefer-const": "error",
         "no-unused-vars": "error",
         "eqeqeq": "error",
-        "no-eval": "error"
+        "no-eval": "error",
+        "@typescript-eslint/no-explicit-any": "off"
     }
 }

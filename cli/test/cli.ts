@@ -267,10 +267,10 @@ export class SdkStub {
 }
 
 describe("CLI", () => {
-  var log: sinon.SinonStub;
-  var sandbox: sinon.SinonSandbox;
-  var spawn: sinon.SinonStub;
-  var wasConfirmed = true;
+  let log: sinon.SinonStub;
+  let sandbox: sinon.SinonSandbox;
+  let spawn: sinon.SinonStub;
+  let wasConfirmed = true;
   const INVALID_RELEASE_FILE_ERROR_MESSAGE: string =
     "It is unnecessary to package releases in a .zip or binary file. Please specify the direct path to the update content's directory (e.g. /platforms/ios/www) or file (e.g. main.jsbundle).";
 
@@ -303,7 +303,7 @@ describe("CLI", () => {
   });
 
   it("accessKeyAdd creates access key with name and default ttl", (done: Mocha.Done): void => {
-    var command: cli.IAccessKeyAddCommand = {
+    const command: cli.IAccessKeyAddCommand = {
       type: cli.CommandType.accessKeyAdd,
       name: "Test name",
     };
@@ -312,8 +312,8 @@ describe("CLI", () => {
       sinon.assert.calledTwice(log);
       assert.equal(log.args[0].length, 1);
 
-      var actual: string = log.args[0][0];
-      var expected = `Successfully created the "Test name" access key: key123`;
+      let actual: string = log.args[0][0];
+      let expected = `Successfully created the "Test name" access key: key123`;
       assert.equal(actual, expected);
 
       actual = log.args[1][0];
@@ -325,8 +325,8 @@ describe("CLI", () => {
   });
 
   it("accessKeyAdd creates access key with name and specified ttl", (done: Mocha.Done): void => {
-    var ttl = 10000;
-    var command: cli.IAccessKeyAddCommand = {
+    const ttl = 10000;
+    const command: cli.IAccessKeyAddCommand = {
       type: cli.CommandType.accessKeyAdd,
       name: "Test name",
       ttl,
@@ -336,8 +336,8 @@ describe("CLI", () => {
       sinon.assert.calledTwice(log);
       assert.equal(log.args[0].length, 1);
 
-      var actual: string = log.args[0][0];
-      var expected = `Successfully created the "Test name" access key: key123`;
+      let actual: string = log.args[0][0];
+      let expected = `Successfully created the "Test name" access key: key123`;
       assert.equal(actual, expected);
 
       actual = log.args[1][0];
@@ -349,7 +349,7 @@ describe("CLI", () => {
   });
 
   it("accessKeyPatch updates access key with new name", (done: Mocha.Done): void => {
-    var command: cli.IAccessKeyPatchCommand = {
+    const command: cli.IAccessKeyPatchCommand = {
       type: cli.CommandType.accessKeyPatch,
       oldName: "Test name",
       newName: "Updated name",
@@ -359,8 +359,8 @@ describe("CLI", () => {
       sinon.assert.calledOnce(log);
       assert.equal(log.args[0].length, 1);
 
-      var actual: string = log.args[0][0];
-      var expected = `Successfully renamed the access key "Test name" to "Updated name".`;
+      const actual: string = log.args[0][0];
+      const expected = `Successfully renamed the access key "Test name" to "Updated name".`;
 
       assert.equal(actual, expected);
       done();
@@ -368,8 +368,8 @@ describe("CLI", () => {
   });
 
   it("accessKeyPatch updates access key with new ttl", (done: Mocha.Done): void => {
-    var ttl = 10000;
-    var command: cli.IAccessKeyPatchCommand = {
+    const ttl = 10000;
+    const command: cli.IAccessKeyPatchCommand = {
       type: cli.CommandType.accessKeyPatch,
       oldName: "Test name",
       ttl,
@@ -379,8 +379,8 @@ describe("CLI", () => {
       sinon.assert.calledOnce(log);
       assert.equal(log.args[0].length, 1);
 
-      var actual: string = log.args[0][0];
-      var expected = `Successfully changed the expiration date of the "Test name" access key to Wednesday, August 17, 2016 12:07 PM.`;
+      const actual: string = log.args[0][0];
+      const expected = `Successfully changed the expiration date of the "Test name" access key to Wednesday, August 17, 2016 12:07 PM.`;
 
       assert.equal(actual, expected);
       done();
@@ -388,8 +388,8 @@ describe("CLI", () => {
   });
 
   it("accessKeyPatch updates access key with new name and ttl", (done: Mocha.Done): void => {
-    var ttl = 10000;
-    var command: cli.IAccessKeyPatchCommand = {
+    const ttl = 10000;
+    const command: cli.IAccessKeyPatchCommand = {
       type: cli.CommandType.accessKeyPatch,
       oldName: "Test name",
       newName: "Updated name",
@@ -400,8 +400,8 @@ describe("CLI", () => {
       sinon.assert.calledOnce(log);
       assert.equal(log.args[0].length, 1);
 
-      var actual: string = log.args[0][0];
-      var expected = `Successfully renamed the access key "Test name" to "Updated name" and changed its expiration date to Wednesday, August 17, 2016 12:07 PM.`;
+      const actual: string = log.args[0][0];
+      const expected = `Successfully renamed the access key "Test name" to "Updated name" and changed its expiration date to Wednesday, August 17, 2016 12:07 PM.`;
 
       assert.equal(actual, expected);
       done();
@@ -409,7 +409,7 @@ describe("CLI", () => {
   });
 
   it("accessKeyList lists access key name and expires fields", (done: Mocha.Done): void => {
-    var command: cli.IAccessKeyListCommand = {
+    const command: cli.IAccessKeyListCommand = {
       type: cli.CommandType.accessKeyList,
       format: "json",
     };
@@ -418,8 +418,8 @@ describe("CLI", () => {
       sinon.assert.calledOnce(log);
       assert.equal(log.args[0].length, 1);
 
-      var actual: string = log.args[0][0];
-      var expected = [
+      const actual: string = log.args[0][0];
+      const expected = [
         {
           createdTime: 0,
           name: "Test name",
@@ -433,12 +433,12 @@ describe("CLI", () => {
   });
 
   it("accessKeyRemove removes access key", (done: Mocha.Done): void => {
-    var command: cli.IAccessKeyRemoveCommand = {
+    const command: cli.IAccessKeyRemoveCommand = {
       type: cli.CommandType.accessKeyRemove,
       accessKey: "8",
     };
 
-    var removeAccessKey: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "removeAccessKey");
+    const removeAccessKey: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "removeAccessKey");
 
     cmdexec.execute(command).done((): void => {
       sinon.assert.calledOnce(removeAccessKey);
@@ -451,12 +451,12 @@ describe("CLI", () => {
   });
 
   it("accessKeyRemove does not remove access key if cancelled", (done: Mocha.Done): void => {
-    var command: cli.IAccessKeyRemoveCommand = {
+    const command: cli.IAccessKeyRemoveCommand = {
       type: cli.CommandType.accessKeyRemove,
       accessKey: "8",
     };
 
-    var removeAccessKey: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "removeAccessKey");
+    const removeAccessKey: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "removeAccessKey");
 
     wasConfirmed = false;
 
@@ -470,7 +470,7 @@ describe("CLI", () => {
   });
 
   it("appAdd reports new app name and ID", (done: Mocha.Done): void => {
-    var command: cli.IAppAddCommand = {
+    const command: cli.IAppAddCommand = {
       type: cli.CommandType.appAdd,
       appName: "a",
       os: "",
@@ -478,8 +478,8 @@ describe("CLI", () => {
       orgName: "",
     };
 
-    var addApp: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "addApp");
-    var deploymentList: sinon.SinonSpy = sandbox.spy(cmdexec, "deploymentList");
+    const addApp: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "addApp");
+    const deploymentList: sinon.SinonSpy = sandbox.spy(cmdexec, "deploymentList");
 
     cmdexec.execute(command).done((): void => {
       sinon.assert.calledOnce(addApp);
@@ -491,7 +491,7 @@ describe("CLI", () => {
   });
 
   it("appList lists app names and ID's", (done: Mocha.Done): void => {
-    var command: cli.IAppListCommand = {
+    const command: cli.IAppListCommand = {
       type: cli.CommandType.appList,
       format: "json",
     };
@@ -500,8 +500,8 @@ describe("CLI", () => {
       sinon.assert.calledOnce(log);
       assert.equal(log.args[0].length, 1);
 
-      var actual: string = log.args[0][0];
-      var expected = [
+      const actual: string = log.args[0][0];
+      const expected = [
         {
           name: "a",
           collaborators: {
@@ -530,13 +530,13 @@ describe("CLI", () => {
   });
 
   it("appRemove removes app", (done: Mocha.Done): void => {
-    var command: cli.IAppRemoveCommand = {
+    const command: cli.IAppRemoveCommand = {
       type: cli.CommandType.appRemove,
       appName: "a",
       orgName: "MyOrganization",
     };
 
-    var removeApp: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "removeApp");
+    const removeApp: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "removeApp");
 
     cmdexec.execute(command).done((): void => {
       sinon.assert.calledOnce(removeApp);
@@ -549,13 +549,13 @@ describe("CLI", () => {
   });
 
   it("appRemove does not remove app if cancelled", (done: Mocha.Done): void => {
-    var command: cli.IAppRemoveCommand = {
+    const command: cli.IAppRemoveCommand = {
       type: cli.CommandType.appRemove,
       appName: "a",
       orgName: "MyOrganization",
     };
 
-    var removeApp: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "removeApp");
+    const removeApp: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "removeApp");
 
     wasConfirmed = false;
 
@@ -569,14 +569,14 @@ describe("CLI", () => {
   });
 
   it("appRename renames app", (done: Mocha.Done): void => {
-    var command: cli.IAppRenameCommand = {
+    const command: cli.IAppRenameCommand = {
       type: cli.CommandType.appRename,
       currentAppName: "a",
       newAppName: "c",
       orgName: "MyOrganization",
     };
 
-    var renameApp: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "renameApp");
+    const renameApp: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "renameApp");
 
     cmdexec.execute(command).done((): void => {
       sinon.assert.calledOnce(renameApp);
@@ -588,14 +588,14 @@ describe("CLI", () => {
   });
 
   it("appTransfer transfers app", (done: Mocha.Done): void => {
-    var command: cli.IAppTransferCommand = {
+    const command: cli.IAppTransferCommand = {
       type: cli.CommandType.appTransfer,
       appName: "a",
       email: "b@b.com",
       orgName: "MyOrganization",
     };
 
-    var transferApp: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "transferApp");
+    const transferApp: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "transferApp");
 
     cmdexec.execute(command).done((): void => {
       sinon.assert.calledOnce(transferApp);
@@ -607,14 +607,14 @@ describe("CLI", () => {
   });
 
   it("collaboratorAdd adds collaborator", (done: Mocha.Done): void => {
-    var command: cli.ICollaboratorAddCommand = {
+    const command: cli.ICollaboratorAddCommand = {
       type: cli.CommandType.collaboratorAdd,
       appName: "a",
       email: "b@b.com",
       orgName: "MyOrganization",
     };
 
-    var addCollaborator: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "addCollaborator");
+    const addCollaborator: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "addCollaborator");
 
     cmdexec.execute(command).done((): void => {
       sinon.assert.calledOnce(addCollaborator);
@@ -626,7 +626,7 @@ describe("CLI", () => {
   });
 
   it("collaboratorList lists collaborators email and properties", (done: Mocha.Done): void => {
-    var command: cli.ICollaboratorListCommand = {
+    const command: cli.ICollaboratorListCommand = {
       type: cli.CommandType.collaboratorList,
       appName: "a",
       format: "json",
@@ -637,8 +637,8 @@ describe("CLI", () => {
       sinon.assert.calledOnce(log);
       assert.equal(log.args[0].length, 1);
 
-      var actual: string = log.args[0][0];
-      var expected = {
+      const actual: string = log.args[0][0];
+      const expected = {
         collaborators: {
           "a@a.com": { permission: "Owner", isCurrentAccount: true },
           "b@b.com": { permission: "Collaborator", isCurrentAccount: false },
@@ -651,14 +651,14 @@ describe("CLI", () => {
   });
 
   it("collaboratorRemove removes collaborator", (done: Mocha.Done): void => {
-    var command: cli.ICollaboratorRemoveCommand = {
+    const command: cli.ICollaboratorRemoveCommand = {
       type: cli.CommandType.collaboratorRemove,
       appName: "a",
       email: "b@b.com",
       orgName: "MyOrganization",
     };
 
-    var removeCollaborator: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "removeCollaborator");
+    const removeCollaborator: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "removeCollaborator");
 
     cmdexec.execute(command).done((): void => {
       sinon.assert.calledOnce(removeCollaborator);
@@ -670,7 +670,7 @@ describe("CLI", () => {
   });
 
   it("deploymentAdd reports new app name and ID", (done: Mocha.Done): void => {
-    var command: cli.IDeploymentAddCommand = {
+    const command: cli.IDeploymentAddCommand = {
       type: cli.CommandType.deploymentAdd,
       appName: "a",
       deploymentName: "b",
@@ -678,7 +678,7 @@ describe("CLI", () => {
       orgName: "MyOrganization",
     };
 
-    var addDeployment: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "addDeployment");
+    const addDeployment: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "addDeployment");
 
     cmdexec.execute(command).done((): void => {
       sinon.assert.calledOnce(addDeployment);
@@ -689,14 +689,14 @@ describe("CLI", () => {
   });
 
   it("deploymentHistoryClear clears deployment", (done: Mocha.Done): void => {
-    var command: cli.IDeploymentHistoryClearCommand = {
+    const command: cli.IDeploymentHistoryClearCommand = {
       type: cli.CommandType.deploymentHistoryClear,
       appName: "a",
       deploymentName: "Staging",
       orgName: "MyOrganization",
     };
 
-    var clearDeployment: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "clearDeploymentHistory");
+    const clearDeployment: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "clearDeploymentHistory");
 
     cmdexec.execute(command).done((): void => {
       sinon.assert.calledOnce(clearDeployment);
@@ -712,14 +712,14 @@ describe("CLI", () => {
   });
 
   it("deploymentHistoryClear does not clear deployment if cancelled", (done: Mocha.Done): void => {
-    var command: cli.IDeploymentHistoryClearCommand = {
+    const command: cli.IDeploymentHistoryClearCommand = {
       type: cli.CommandType.deploymentHistoryClear,
       appName: "a",
       deploymentName: "Staging",
       orgName: "MyOrganization",
     };
 
-    var clearDeployment: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "clearDeploymentHistory");
+    const clearDeployment: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "clearDeploymentHistory");
 
     wasConfirmed = false;
 
@@ -733,7 +733,7 @@ describe("CLI", () => {
   });
 
   it("deploymentList lists deployment names, deployment keys, and package information", (done: Mocha.Done): void => {
-    var command: cli.IDeploymentListCommand = {
+    const command: cli.IDeploymentListCommand = {
       type: cli.CommandType.deploymentList,
       appName: "a",
       format: "json",
@@ -745,8 +745,8 @@ describe("CLI", () => {
       sinon.assert.calledOnce(log);
       assert.equal(log.args[0].length, 1);
 
-      var actual: string = log.args[0][0];
-      var expected = [
+      const actual: string = log.args[0][0];
+      const expected = [
         {
           name: "Production",
           key: "6",
@@ -780,14 +780,14 @@ describe("CLI", () => {
   });
 
   it("deploymentRemove removes deployment", (done: Mocha.Done): void => {
-    var command: cli.IDeploymentRemoveCommand = {
+    const command: cli.IDeploymentRemoveCommand = {
       type: cli.CommandType.deploymentRemove,
       appName: "a",
       deploymentName: "Staging",
       orgName: "MyOrganization",
     };
 
-    var removeDeployment: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "removeDeployment");
+    const removeDeployment: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "removeDeployment");
 
     cmdexec.execute(command).done((): void => {
       sinon.assert.calledOnce(removeDeployment);
@@ -800,14 +800,14 @@ describe("CLI", () => {
   });
 
   it("deploymentRemove does not remove deployment if cancelled", (done: Mocha.Done): void => {
-    var command: cli.IDeploymentRemoveCommand = {
+    const command: cli.IDeploymentRemoveCommand = {
       type: cli.CommandType.deploymentRemove,
       appName: "a",
       deploymentName: "Staging",
       orgName: "MyOrganization",
     };
 
-    var removeDeployment: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "removeDeployment");
+    const removeDeployment: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "removeDeployment");
 
     wasConfirmed = false;
 
@@ -821,7 +821,7 @@ describe("CLI", () => {
   });
 
   it("deploymentRename renames deployment", (done: Mocha.Done): void => {
-    var command: cli.IDeploymentRenameCommand = {
+    const command: cli.IDeploymentRenameCommand = {
       type: cli.CommandType.deploymentRename,
       appName: "a",
       currentDeploymentName: "Staging",
@@ -829,7 +829,7 @@ describe("CLI", () => {
       orgName: "MyOrganization",
     };
 
-    var renameDeployment: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "renameDeployment");
+    const renameDeployment: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "renameDeployment");
 
     cmdexec.execute(command).done((): void => {
       sinon.assert.calledOnce(renameDeployment);
@@ -841,7 +841,7 @@ describe("CLI", () => {
   });
 
   it("deploymentHistory lists package history information", (done: Mocha.Done): void => {
-    var command: cli.IDeploymentHistoryCommand = {
+    const command: cli.IDeploymentHistoryCommand = {
       type: cli.CommandType.deploymentHistory,
       appName: "a",
       deploymentName: "Staging",
@@ -850,15 +850,15 @@ describe("CLI", () => {
       orgName: "MyOrganization",
     };
 
-    var getDeploymentHistory: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "getDeploymentHistory");
+    const getDeploymentHistory: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "getDeploymentHistory");
 
     cmdexec.execute(command).done((): void => {
       sinon.assert.calledOnce(getDeploymentHistory);
       sinon.assert.calledOnce(log);
       assert.equal(log.args[0].length, 1);
 
-      var actual: string = log.args[0][0];
-      var expected: codePush.Package[] = [
+      const actual: string = log.args[0][0];
+      const expected: codePush.Package[] = [
         {
           description: null,
           appVersion: "1.0.0",
@@ -887,7 +887,7 @@ describe("CLI", () => {
   });
 
   it("patch command successfully updates specific label", (done: Mocha.Done): void => {
-    var command: cli.IPatchCommand = {
+    const command: cli.IPatchCommand = {
       type: cli.CommandType.patch,
       appName: "a",
       deploymentName: "Staging",
@@ -900,7 +900,7 @@ describe("CLI", () => {
       orgName: "MyOrganization",
     };
 
-    var patch: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "patchRelease");
+    const patch: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "patchRelease");
 
     cmdexec.execute(command).done((): void => {
       sinon.assert.calledOnce(patch);
@@ -912,7 +912,7 @@ describe("CLI", () => {
   });
 
   it("patch command successfully updates latest release", (done: Mocha.Done): void => {
-    var command: cli.IPatchCommand = {
+    const command: cli.IPatchCommand = {
       type: cli.CommandType.patch,
       appName: "a",
       deploymentName: "Staging",
@@ -925,7 +925,7 @@ describe("CLI", () => {
       orgName: "MyOrganization",
     };
 
-    var patch: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "patchRelease");
+    const patch: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "patchRelease");
 
     cmdexec.execute(command).done((): void => {
       sinon.assert.calledOnce(patch);
@@ -937,7 +937,7 @@ describe("CLI", () => {
   });
 
   it("patch command successfully updates without appStoreVersion", (done: Mocha.Done): void => {
-    var command: cli.IPatchCommand = {
+    const command: cli.IPatchCommand = {
       type: cli.CommandType.patch,
       appName: "a",
       deploymentName: "Staging",
@@ -950,7 +950,7 @@ describe("CLI", () => {
       orgName: "MyOrganization",
     };
 
-    var patch: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "patchRelease");
+    const patch: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "patchRelease");
 
     cmdexec.execute(command).done((): void => {
       sinon.assert.calledOnce(patch);
@@ -962,7 +962,7 @@ describe("CLI", () => {
   });
 
   it("patch command fails if no properties were specified for update", (done: Mocha.Done): void => {
-    var command: cli.IPatchCommand = {
+    const command: cli.IPatchCommand = {
       type: cli.CommandType.patch,
       appName: "a",
       deploymentName: "Staging",
@@ -975,7 +975,7 @@ describe("CLI", () => {
       orgName: "MyOrganization",
     };
 
-    var patch: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "patchRelease");
+    const patch: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "patchRelease");
 
     cmdexec
       .execute(command)
@@ -991,7 +991,7 @@ describe("CLI", () => {
   });
 
   it("promote works successfully", (done: Mocha.Done): void => {
-    var command: cli.IPromoteCommand = {
+    const command: cli.IPromoteCommand = {
       type: cli.CommandType.promote,
       appName: "a",
       sourceDeploymentName: "Staging",
@@ -1003,7 +1003,7 @@ describe("CLI", () => {
       orgName: "MyOrganization",
     };
 
-    var promote: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "promote");
+    const promote: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "promote");
 
     cmdexec.execute(command).done((): void => {
       sinon.assert.calledOnce(promote);
@@ -1018,7 +1018,7 @@ describe("CLI", () => {
   });
 
   it("promote works successfully without appStoreVersion", (done: Mocha.Done): void => {
-    var command: cli.IPromoteCommand = {
+    const command: cli.IPromoteCommand = {
       type: cli.CommandType.promote,
       appName: "a",
       sourceDeploymentName: "Staging",
@@ -1030,7 +1030,7 @@ describe("CLI", () => {
       orgName: "MyOrganization",
     };
 
-    var promote: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "promote");
+    const promote: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "promote");
 
     cmdexec.execute(command).done((): void => {
       sinon.assert.calledOnce(promote);
@@ -1045,14 +1045,14 @@ describe("CLI", () => {
   });
 
   it("rollback works successfully", (done: Mocha.Done): void => {
-    var command: cli.IRollbackCommand = {
+    const command: cli.IRollbackCommand = {
       type: cli.CommandType.rollback,
       appName: "a",
       deploymentName: "Staging",
       targetRelease: "v2",
     };
 
-    var rollback: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "rollback");
+    const rollback: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "rollback");
 
     cmdexec.execute(command).done((): void => {
       sinon.assert.calledOnce(rollback);
@@ -1064,7 +1064,7 @@ describe("CLI", () => {
   });
 
   it("release doesn't allow non valid semver ranges", (done: Mocha.Done): void => {
-    var command: cli.IReleaseCommand = {
+    const command: cli.IReleaseCommand = {
       type: cli.CommandType.release,
       appName: "a",
       deploymentName: "Staging",
@@ -1084,7 +1084,7 @@ describe("CLI", () => {
   });
 
   it("release doesn't allow releasing .zip file", (done: Mocha.Done): void => {
-    var command: cli.IReleaseCommand = {
+    const command: cli.IReleaseCommand = {
       type: cli.CommandType.release,
       appName: "a",
       deploymentName: "Staging",
@@ -1100,7 +1100,7 @@ describe("CLI", () => {
   });
 
   it("release doesn't allow releasing .ipa file", (done: Mocha.Done): void => {
-    var command: cli.IReleaseCommand = {
+    const command: cli.IReleaseCommand = {
       type: cli.CommandType.release,
       appName: "a",
       deploymentName: "Staging",
@@ -1116,7 +1116,7 @@ describe("CLI", () => {
   });
 
   it("release doesn't allow releasing .apk file", (done: Mocha.Done): void => {
-    var command: cli.IReleaseCommand = {
+    const command: cli.IReleaseCommand = {
       type: cli.CommandType.release,
       appName: "a",
       deploymentName: "Staging",
@@ -1132,7 +1132,7 @@ describe("CLI", () => {
   });
 
   it("release-react fails if CWD does not contain package.json", (done: Mocha.Done): void => {
-    var command: cli.IReleaseReactCommand = {
+    const command: cli.IReleaseReactCommand = {
       type: cli.CommandType.releaseReact,
       appName: "a",
       appStoreVersion: null,
@@ -1144,7 +1144,7 @@ describe("CLI", () => {
       orgName: "MyOrganization",
     };
 
-    var release: sinon.SinonSpy = sandbox.spy(cmdexec, "release");
+    const release: sinon.SinonSpy = sandbox.spy(cmdexec, "release");
 
     cmdexec
       .execute(command)
@@ -1164,7 +1164,7 @@ describe("CLI", () => {
   });
 
   it("release-react fails if entryFile does not exist", (done: Mocha.Done): void => {
-    var command: cli.IReleaseReactCommand = {
+    const command: cli.IReleaseReactCommand = {
       type: cli.CommandType.releaseReact,
       appName: "a",
       appStoreVersion: null,
@@ -1179,7 +1179,7 @@ describe("CLI", () => {
 
     ensureInTestAppDirectory();
 
-    var release: sinon.SinonSpy = sandbox.spy(cmdexec, "release");
+    const release: sinon.SinonSpy = sandbox.spy(cmdexec, "release");
 
     cmdexec
       .execute(command)
@@ -1196,7 +1196,7 @@ describe("CLI", () => {
   });
 
   it("release-react fails if platform is invalid", (done: Mocha.Done): void => {
-    var command: cli.IReleaseReactCommand = {
+    const command: cli.IReleaseReactCommand = {
       type: cli.CommandType.releaseReact,
       appName: "a",
       appStoreVersion: null,
@@ -1210,7 +1210,7 @@ describe("CLI", () => {
 
     ensureInTestAppDirectory();
 
-    var release: sinon.SinonSpy = sandbox.spy(cmdexec, "release");
+    const release: sinon.SinonSpy = sandbox.spy(cmdexec, "release");
 
     cmdexec
       .execute(command)
@@ -1227,8 +1227,8 @@ describe("CLI", () => {
   });
 
   it("release-react fails if targetBinaryRange is not a valid semver range expression", (done: Mocha.Done): void => {
-    var bundleName = "bundle.js";
-    var command: cli.IReleaseReactCommand = {
+    const bundleName = "bundle.js";
+    const command: cli.IReleaseReactCommand = {
       type: cli.CommandType.releaseReact,
       appName: "a",
       appStoreVersion: "notsemver",
@@ -1244,7 +1244,7 @@ describe("CLI", () => {
 
     ensureInTestAppDirectory();
 
-    var release: sinon.SinonSpy = sandbox.stub(cmdexec, "release");
+    const release: sinon.SinonSpy = sandbox.stub(cmdexec, "release");
 
     cmdexec
       .execute(command)
@@ -1261,8 +1261,8 @@ describe("CLI", () => {
   });
 
   it("release-react defaults entry file to index.{platform}.js if not provided", (done: Mocha.Done): void => {
-    var bundleName = "bundle.js";
-    var command: cli.IReleaseReactCommand = {
+    const bundleName = "bundle.js";
+    const command: cli.IReleaseReactCommand = {
       type: cli.CommandType.releaseReact,
       appName: "a",
       appStoreVersion: null,
@@ -1277,18 +1277,18 @@ describe("CLI", () => {
 
     ensureInTestAppDirectory();
 
-    var release: sinon.SinonSpy = sandbox.stub(cmdexec, "release");
+    const release: sinon.SinonSpy = sandbox.stub(cmdexec, "release");
 
     cmdexec
       .execute(command)
       .then(() => {
-        var releaseCommand: cli.IReleaseCommand = <any>command;
+        const releaseCommand: cli.IReleaseCommand = <any>command;
         releaseCommand.package = path.join(os.tmpdir(), "CodePush");
         releaseCommand.appStoreVersion = "1.2.3";
 
         sinon.assert.calledOnce(spawn);
-        var spawnCommand: string = spawn.args[0][0];
-        var spawnCommandArgs: string = spawn.args[0][1].join(" ");
+        const spawnCommand: string = spawn.args[0][0];
+        const spawnCommandArgs: string = spawn.args[0][1].join(" ");
         assert.equal(spawnCommand, "node");
         assert.equal(
           spawnCommandArgs,
@@ -1304,7 +1304,7 @@ describe("CLI", () => {
   });
 
   it('release-react defaults bundle name to "main.jsbundle" if not provided and platform is "ios"', (done: Mocha.Done): void => {
-    var command: cli.IReleaseReactCommand = {
+    const command: cli.IReleaseReactCommand = {
       type: cli.CommandType.releaseReact,
       appName: "a",
       appStoreVersion: null,
@@ -1318,19 +1318,19 @@ describe("CLI", () => {
 
     ensureInTestAppDirectory();
 
-    var release: sinon.SinonSpy = sandbox.stub(cmdexec, "release");
+    const release: sinon.SinonSpy = sandbox.stub(cmdexec, "release");
 
     cmdexec
       .execute(command)
       .then(() => {
-        var releaseCommand: cli.IReleaseCommand = <any>clone(command);
-        var packagePath: string = path.join(os.tmpdir(), "CodePush");
+        const releaseCommand: cli.IReleaseCommand = <any>clone(command);
+        const packagePath: string = path.join(os.tmpdir(), "CodePush");
         releaseCommand.package = packagePath;
         releaseCommand.appStoreVersion = "1.2.3";
 
         sinon.assert.calledOnce(spawn);
-        var spawnCommand: string = spawn.args[0][0];
-        var spawnCommandArgs: string = spawn.args[0][1].join(" ");
+        const spawnCommand: string = spawn.args[0][0];
+        const spawnCommandArgs: string = spawn.args[0][1].join(" ");
         assert.equal(spawnCommand, "node");
         assert.equal(
           spawnCommandArgs,
@@ -1351,7 +1351,7 @@ describe("CLI", () => {
   });
 
   it('release-react defaults bundle name to "index.android.bundle" if not provided and platform is "android"', (done: Mocha.Done): void => {
-    var command: cli.IReleaseReactCommand = {
+    const command: cli.IReleaseReactCommand = {
       type: cli.CommandType.releaseReact,
       appName: "a",
       appStoreVersion: null,
@@ -1365,19 +1365,19 @@ describe("CLI", () => {
 
     ensureInTestAppDirectory();
 
-    var release: sinon.SinonSpy = sandbox.stub(cmdexec, "release");
+    const release: sinon.SinonSpy = sandbox.stub(cmdexec, "release");
 
     cmdexec
       .execute(command)
       .then(() => {
-        var releaseCommand: cli.IReleaseCommand = <any>clone(command);
-        var packagePath: string = path.join(os.tmpdir(), "CodePush");
+        const releaseCommand: cli.IReleaseCommand = <any>clone(command);
+        const packagePath: string = path.join(os.tmpdir(), "CodePush");
         releaseCommand.package = packagePath;
         releaseCommand.appStoreVersion = "1.0.0";
 
         sinon.assert.calledOnce(spawn);
-        var spawnCommand: string = spawn.args[0][0];
-        var spawnCommandArgs: string = spawn.args[0][1].join(" ");
+        const spawnCommand: string = spawn.args[0][0];
+        const spawnCommandArgs: string = spawn.args[0][1].join(" ");
         assert.equal(spawnCommand, "node");
         assert.equal(
           spawnCommandArgs,
@@ -1398,7 +1398,7 @@ describe("CLI", () => {
   });
 
   it('release-react defaults bundle name to "index.windows.bundle" if not provided and platform is "windows"', (done: Mocha.Done): void => {
-    var command: cli.IReleaseReactCommand = {
+    const command: cli.IReleaseReactCommand = {
       type: cli.CommandType.releaseReact,
       appName: "a",
       appStoreVersion: null,
@@ -1412,19 +1412,19 @@ describe("CLI", () => {
 
     ensureInTestAppDirectory();
 
-    var release: sinon.SinonSpy = sandbox.stub(cmdexec, "release");
+    const release: sinon.SinonSpy = sandbox.stub(cmdexec, "release");
 
     cmdexec
       .execute(command)
       .then(() => {
-        var releaseCommand: cli.IReleaseCommand = <any>clone(command);
-        var packagePath = path.join(os.tmpdir(), "CodePush");
+        const releaseCommand: cli.IReleaseCommand = <any>clone(command);
+        const packagePath = path.join(os.tmpdir(), "CodePush");
         releaseCommand.package = packagePath;
         releaseCommand.appStoreVersion = "1.0.0";
 
         sinon.assert.calledOnce(spawn);
-        var spawnCommand: string = spawn.args[0][0];
-        var spawnCommandArgs: string = spawn.args[0][1].join(" ");
+        const spawnCommand: string = spawn.args[0][0];
+        const spawnCommandArgs: string = spawn.args[0][1].join(" ");
         assert.equal(spawnCommand, "node");
         assert.equal(
           spawnCommandArgs,
@@ -1445,8 +1445,8 @@ describe("CLI", () => {
   });
 
   it("release-react generates dev bundle", (done: Mocha.Done): void => {
-    var bundleName = "bundle.js";
-    var command: cli.IReleaseReactCommand = {
+    const bundleName = "bundle.js";
+    const command: cli.IReleaseReactCommand = {
       type: cli.CommandType.releaseReact,
       appName: "a",
       appStoreVersion: null,
@@ -1463,18 +1463,18 @@ describe("CLI", () => {
 
     ensureInTestAppDirectory();
 
-    var release: sinon.SinonSpy = sandbox.stub(cmdexec, "release");
+    const release: sinon.SinonSpy = sandbox.stub(cmdexec, "release");
 
     cmdexec
       .execute(command)
       .then(() => {
-        var releaseCommand: cli.IReleaseCommand = <any>command;
+        const releaseCommand: cli.IReleaseCommand = <any>command;
         releaseCommand.package = path.join(os.tmpdir(), "CodePush");
         releaseCommand.appStoreVersion = "1.2.3";
 
         sinon.assert.calledOnce(spawn);
-        var spawnCommand: string = spawn.args[0][0];
-        var spawnCommandArgs: string = spawn.args[0][1].join(" ");
+        const spawnCommand: string = spawn.args[0][0];
+        const spawnCommandArgs: string = spawn.args[0][1].join(" ");
         assert.equal(spawnCommand, "node");
         assert.equal(
           spawnCommandArgs,
@@ -1494,8 +1494,8 @@ describe("CLI", () => {
   });
 
   it("release-react generates sourcemaps", (done: Mocha.Done): void => {
-    var bundleName = "bundle.js";
-    var command: cli.IReleaseReactCommand = {
+    const bundleName = "bundle.js";
+    const command: cli.IReleaseReactCommand = {
       type: cli.CommandType.releaseReact,
       appName: "a",
       appStoreVersion: null,
@@ -1511,18 +1511,18 @@ describe("CLI", () => {
 
     ensureInTestAppDirectory();
 
-    var release: sinon.SinonSpy = sandbox.stub(cmdexec, "release");
+    const release: sinon.SinonSpy = sandbox.stub(cmdexec, "release");
 
     cmdexec
       .execute(command)
       .then(() => {
-        var releaseCommand: cli.IReleaseCommand = <any>command;
+        const releaseCommand: cli.IReleaseCommand = <any>command;
         releaseCommand.package = path.join(os.tmpdir(), "CodePush");
         releaseCommand.appStoreVersion = "1.2.3";
 
         sinon.assert.calledOnce(spawn);
-        var spawnCommand: string = spawn.args[0][0];
-        var spawnCommandArgs: string = spawn.args[0][1].join(" ");
+        const spawnCommand: string = spawn.args[0][0];
+        const spawnCommandArgs: string = spawn.args[0][1].join(" ");
         assert.equal(spawnCommand, "node");
         assert.equal(
           spawnCommandArgs,
@@ -1542,8 +1542,8 @@ describe("CLI", () => {
   });
 
   it("release-react uses specified targetBinaryRange option", (done: Mocha.Done): void => {
-    var bundleName = "bundle.js";
-    var command: cli.IReleaseReactCommand = {
+    const bundleName = "bundle.js";
+    const command: cli.IReleaseReactCommand = {
       type: cli.CommandType.releaseReact,
       appName: "a",
       appStoreVersion: ">=1.0.0 <1.0.5",
@@ -1559,17 +1559,17 @@ describe("CLI", () => {
 
     ensureInTestAppDirectory();
 
-    var release: sinon.SinonSpy = sandbox.stub(cmdexec, "release");
+    const release: sinon.SinonSpy = sandbox.stub(cmdexec, "release");
 
     cmdexec
       .execute(command)
       .then(() => {
-        var releaseCommand: cli.IReleaseCommand = <any>command;
+        const releaseCommand: cli.IReleaseCommand = <any>command;
         releaseCommand.package = path.join(os.tmpdir(), "CodePush");
 
         sinon.assert.calledOnce(spawn);
-        var spawnCommand: string = spawn.args[0][0];
-        var spawnCommandArgs: string = spawn.args[0][1].join(" ");
+        const spawnCommand: string = spawn.args[0][0];
+        const spawnCommandArgs: string = spawn.args[0][1].join(" ");
         assert.equal(spawnCommand, "node");
         assert.equal(
           spawnCommandArgs,
@@ -1589,8 +1589,8 @@ describe("CLI", () => {
   });
 
   it("release-react applies arguments to node binary provided via the CODE_PUSH_NODE_ARGS env var", (done: Mocha.Done): void => {
-    var bundleName = "bundle.js";
-    var command: cli.IReleaseReactCommand = {
+    const bundleName = "bundle.js";
+    const command: cli.IReleaseReactCommand = {
       type: cli.CommandType.releaseReact,
       appName: "a",
       appStoreVersion: null,
@@ -1605,21 +1605,21 @@ describe("CLI", () => {
 
     ensureInTestAppDirectory();
 
-    var release: sinon.SinonSpy = sandbox.stub(cmdexec, "release");
+    const release: sinon.SinonSpy = sandbox.stub(cmdexec, "release");
 
-    var _CODE_PUSH_NODE_ARGS: string = process.env.CODE_PUSH_NODE_ARGS;
+    const _CODE_PUSH_NODE_ARGS: string = process.env.CODE_PUSH_NODE_ARGS;
     process.env.CODE_PUSH_NODE_ARGS = "  --foo=bar    --baz  ";
 
     cmdexec
       .execute(command)
       .then(() => {
-        var releaseCommand: cli.IReleaseCommand = <any>command;
+        const releaseCommand: cli.IReleaseCommand = <any>command;
         releaseCommand.package = path.join(os.tmpdir(), "CodePush");
         releaseCommand.appStoreVersion = "1.2.3";
 
         sinon.assert.calledOnce(spawn);
-        var spawnCommand: string = spawn.args[0][0];
-        var spawnCommandArgs: string = spawn.args[0][1].join(" ");
+        const spawnCommand: string = spawn.args[0][0];
+        const spawnCommandArgs: string = spawn.args[0][1].join(" ");
         assert.equal(spawnCommand, "node");
         assert.equal(
           spawnCommandArgs,
@@ -1638,7 +1638,7 @@ describe("CLI", () => {
   });
 
   it("sessionList lists session name and expires fields", (done: Mocha.Done): void => {
-    var command: cli.IAccessKeyListCommand = {
+    const command: cli.IAccessKeyListCommand = {
       type: cli.CommandType.sessionList,
       format: "json",
     };
@@ -1647,8 +1647,8 @@ describe("CLI", () => {
       sinon.assert.calledOnce(log);
       assert.equal(log.args[0].length, 1);
 
-      var actual: string = log.args[0][0];
-      var expected = [
+      const actual: string = log.args[0][0];
+      const expected = [
         {
           loggedInTime: 0,
           machineName: TEST_MACHINE_NAME,
@@ -1661,13 +1661,13 @@ describe("CLI", () => {
   });
 
   it("sessionRemove removes session", (done: Mocha.Done): void => {
-    var machineName = TEST_MACHINE_NAME;
-    var command: cli.ISessionRemoveCommand = {
+    const machineName = TEST_MACHINE_NAME;
+    const command: cli.ISessionRemoveCommand = {
       type: cli.CommandType.sessionRemove,
       machineName: machineName,
     };
 
-    var removeSession: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "removeSession");
+    const removeSession: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "removeSession");
 
     cmdexec.execute(command).done((): void => {
       sinon.assert.calledOnce(removeSession);
@@ -1680,13 +1680,13 @@ describe("CLI", () => {
   });
 
   it("sessionRemove does not remove session if cancelled", (done: Mocha.Done): void => {
-    var machineName = TEST_MACHINE_NAME;
-    var command: cli.ISessionRemoveCommand = {
+    const machineName = TEST_MACHINE_NAME;
+    const command: cli.ISessionRemoveCommand = {
       type: cli.CommandType.sessionRemove,
       machineName: machineName,
     };
 
-    var removeSession: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "removeSession");
+    const removeSession: sinon.SinonSpy = sandbox.spy(cmdexec.sdk, "removeSession");
 
     wasConfirmed = false;
 
@@ -1700,8 +1700,8 @@ describe("CLI", () => {
   });
 
   it("sessionRemove does not remove current session", (done: Mocha.Done): void => {
-    var machineName = os.hostname();
-    var command: cli.ISessionRemoveCommand = {
+    const machineName = os.hostname();
+    const command: cli.ISessionRemoveCommand = {
       type: cli.CommandType.sessionRemove,
       machineName: machineName,
     };

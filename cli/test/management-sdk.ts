@@ -7,9 +7,9 @@ import * as Q from "q";
 import AccountManager = require("../script/management-sdk");
 import { CommandType, IAppAddCommand } from "../script/types/cli";
 
-var request = require("superagent");
+const request = require("superagent");
 
-var manager: AccountManager;
+let manager: AccountManager;
 describe("Management SDK", () => {
   beforeEach(() => {
     manager = new AccountManager(/*accessKey=*/ "dummyAccessKey", /*customHeaders=*/ null, /*serverUrl=*/ "http://localhost");
@@ -23,7 +23,7 @@ describe("Management SDK", () => {
   it("methods reject the promise with status code info when an error occurs", (done: Mocha.Done) => {
     mockReturn("Text", 404);
 
-    var methodsWithErrorHandling: any[] = [
+    const methodsWithErrorHandling: any[] = [
       manager.addApp.bind(manager, "appName"),
       manager.getApp.bind(manager, "appName"),
       manager.renameApp.bind(manager, "appName", {}),
@@ -49,7 +49,7 @@ describe("Management SDK", () => {
       manager.rollback.bind(manager, "appName", "deploymentName", "targetReleaseLabel"),
     ];
 
-    var result = Q<void>(null);
+    let result = Q<void>(null);
     methodsWithErrorHandling.forEach(function (f) {
       result = result.then(() => {
         return testErrors(f);
@@ -423,9 +423,9 @@ function mockReturn(bodyText: string, statusCode: number, header = {}): void {
     {
       pattern: "http://localhost/(\\w+)/?",
       fixtures: function (match: any, params: any): any {
-        var isOk = statusCode >= 200 && statusCode < 300;
+        const isOk = statusCode >= 200 && statusCode < 300;
         if (!isOk) {
-          var err: any = new Error(bodyText);
+          const err: any = new Error(bodyText);
           err.status = statusCode;
           throw err;
         }

@@ -5,17 +5,17 @@ import * as assert from "assert";
 import * as crypto from "crypto";
 import * as fs from "fs";
 import * as hashUtils from "../script/hash-utils";
-var mkdirp = require("mkdirp");
+const mkdirp = require("mkdirp");
 import * as os from "os";
 import * as path from "path";
 import * as q from "q";
-var yauzl = require("yauzl");
+const yauzl = require("yauzl");
 
 import PackageManifest = hashUtils.PackageManifest;
 import Promise = q.Promise;
 
 function randomString(): string {
-  var stringLength = 10;
+  const stringLength = 10;
   return crypto
     .randomBytes(Math.ceil(stringLength / 2))
     .toString("hex") // convert to hexadecimal format
@@ -23,8 +23,8 @@ function randomString(): string {
 }
 
 function unzipToDirectory(zipPath: string, directoryPath: string): Promise<void> {
-  var deferred: q.Deferred<void> = q.defer<void>();
-  var originalCwd: string = process.cwd();
+  const deferred: q.Deferred<void> = q.defer<void>();
+  const originalCwd: string = process.cwd();
 
   mkdirp(directoryPath, (err: Error) => {
     if (err) throw err;
@@ -91,10 +91,10 @@ describe("Hashing utility", () => {
 
   it("generates a package manifest for an archive", (done) => {
     hashUtils.generatePackageManifestFromZip(TEST_ARCHIVE_FILE_PATH).done((manifest: PackageManifest): void => {
-      var fileHashesMap = manifest.toMap();
+      const fileHashesMap = manifest.toMap();
       assert.equal(fileHashesMap.size, 3);
 
-      var hash: string = fileHashesMap.get("b.txt");
+      let hash: string = fileHashesMap.get("b.txt");
       assert.equal(hash, HASH_B);
 
       hash = fileHashesMap.get("c.txt");
@@ -108,17 +108,17 @@ describe("Hashing utility", () => {
   });
 
   it("generates a package manifest for a directory", (done) => {
-    var directory = path.join(TEST_DIRECTORY, "testZip");
+    const directory = path.join(TEST_DIRECTORY, "testZip");
 
     unzipToDirectory(TEST_ARCHIVE_FILE_PATH, directory)
       .then(() => {
         return hashUtils.generatePackageManifestFromDirectory(/*directoryPath*/ directory, /*basePath*/ directory);
       })
       .done((manifest: PackageManifest): void => {
-        var fileHashesMap = manifest.toMap();
+        const fileHashesMap = manifest.toMap();
         assert.equal(fileHashesMap.size, 3);
 
-        var hash: string = fileHashesMap.get("b.txt");
+        let hash: string = fileHashesMap.get("b.txt");
         assert.equal(hash, HASH_B);
 
         hash = fileHashesMap.get("c.txt");
@@ -147,14 +147,14 @@ describe("Hashing utility", () => {
   it("generates a package manifest for an archive with ignorable metadata", (done) => {
     hashUtils.generatePackageManifestFromZip(IGNORED_METADATA_ARCHIVE_FILE_PATH).done((manifest: PackageManifest): void => {
       assert.equal(manifest.toMap().size, 1);
-      var hash: string = manifest.toMap().get("www/index.html");
+      const hash: string = manifest.toMap().get("www/index.html");
       assert.equal(hash, INDEX_HASH);
       done();
     });
   });
 
   it("generates a package manifest for a directory with ignorable metadata", (done) => {
-    var directory = path.join(TEST_DIRECTORY, "ignorableMetadata");
+    const directory = path.join(TEST_DIRECTORY, "ignorableMetadata");
 
     unzipToDirectory(IGNORED_METADATA_ARCHIVE_FILE_PATH, directory)
       .then(() => {
@@ -162,7 +162,7 @@ describe("Hashing utility", () => {
       })
       .done((manifest: PackageManifest): void => {
         assert.equal(manifest.toMap().size, 1);
-        var hash: string = manifest.toMap().get("www/index.html");
+        const hash: string = manifest.toMap().get("www/index.html");
         assert.equal(hash, INDEX_HASH);
         done();
       });
