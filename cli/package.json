@@ -1,15 +1,15 @@
 {
   "name": "rupush-cli",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Management CLI for the CodePush service",
-  "main": ".bin/script/cli.js",
-  "module": ".bin/script/cli.mjs",
-  "types": ".bin/script/cli.d.ts",
+  "main": ".bin/cli.js",
+  "module": ".bin/cli.mjs",
+  "types": ".bin/cli.d.ts",
   "files": [
     "bin"
   ],
   "scripts": {
-    "start": "node ./bin/script/cli.js",
+    "start": "node ./bin/cli.js",
     "build": "tsup",
     "dev:tsc": "tsc --watch",
     "prettier": "prettier --write \"./**/*.ts\"",
@@ -17,11 +17,11 @@
     "lint:fix": "npx eslint ./script/**/*.ts --fix"
   },
   "bin": {
-    "rupush": "./bin/script/cli.js"
+    "rupush": "bin/cli.js"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/ajitaro/code-push-server-ms"
+    "url": "git+https://github.com/ajitaro/code-push-server-ms.git"
   },
   "author": "ajitaro",
   "dependencies": {
