@@ -466,6 +466,16 @@ yargs
           .example("organization ls", "Lists the organizations");
         addCommonConfiguration(yargs);
       })
+      .command(["remove", "rm"], "Remove an organization", (yargs: yargs.Argv) => {
+        isValidCommand = true;
+        yargs
+          .usage(USAGE_PREFIX + " organization remove <organization>")
+          .demand(/*count*/ 1, /*max*/ 1) // Require exactly one non-option argument
+          .example("organization remove MyOrg", 'Removes organization "MyOrg"')
+          .example("organization rm MyOrg", 'Removes organization "MyOrg"');
+
+        addCommonConfiguration(yargs);
+      })
       .check((argv: any, aliases: { [aliases: string]: string }): any => isValidCommand); // Report unrecognized, non-hyphenated command category.
     addCommonConfiguration(yargs);
   })
@@ -1180,6 +1190,15 @@ export function createCommand(): cli.ICommand {
           case "list":
           case "ls":
             cmd = { type: cli.CommandType.organizationList };
+            break;
+          
+          case "remove":
+          case "rm":
+            if (arg2) {
+              cmd = { type: cli.CommandType.organizationRemove };
+              const organizationCommand = <cli.IOrganizationCommand>cmd;
+              organizationCommand.orgName = arg2;
+            }
             break;
         }
         break;

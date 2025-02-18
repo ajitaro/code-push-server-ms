@@ -215,10 +215,18 @@ class AccountManager {
   }
 
   public addOrganizations(orgName: string): Promise<Organization> {
-    return this.post(urlEncode([`/organizations/${orgName}`]), JSON.stringify({ name: orgName }), /*expectResponseBody=*/ true).then(
+    return this.post(urlEncode([`/organizations/${orgName}`]), '', /*expectResponseBody=*/ true).then(
       (res: JsonResponse) => res.body.organization
     );
   }
+
+  public removeOrganization(orgName: string): Promise<{ message: string }> {
+    return this.patch(urlEncode([`/organizations/${orgName}`]), '', /*expectResponseBody=*/ true)
+      .then((res: JsonResponse) => {
+        return res.body.message;
+      });
+  }
+  
 
   // Apps
   public getApps(): Promise<App[]> {

@@ -94,6 +94,7 @@ export interface Account {
   /*key*/ email: string;
   name: string;
   linkedProviders: string[];
+  serverUrl: string;
 }
 
 export interface Organization {

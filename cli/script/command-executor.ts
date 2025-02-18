@@ -538,6 +538,9 @@ export function execute(command: cli.ICommand) {
       case cli.CommandType.organizationList:
         return organizationList();
 
+      case cli.CommandType.organizationRemove:
+        return organizationRemove(<cli.IOrganizationCommand>command);
+
       case cli.CommandType.patch:
         return patch(<cli.IPatchCommand>command);
 
@@ -673,6 +676,20 @@ function organizationList(): Promise<void> {
             dataSource.push([index + 1, org.name])
           });
         });
+      });
+    })
+    .catch((err: CodePushError) => console.warn(chalk.red("[Error] " + err.message)));
+}
+
+function organizationRemove(command: cli.IOrganizationCommand): Promise<void> {
+  return sdk.isAuthenticated(true)
+    .then((isAuth: boolean): Promise<void> => {
+      if (!isAuth) {
+        throw new Error("Not authenticated.");
+      }
+
+      return sdk.removeOrganization(command.orgName).then((res): void => {
+        log(res);
       });
     })
     .catch((err: CodePushError) => console.warn(chalk.red("[Error] " + err.message)));
@@ -1607,7 +1624,7 @@ function throwForInvalidOutputFormat(format: string): void {
 
 function whoami(command: cli.ICommand): Promise<void> {
   return sdk.getAccountInfo().then((account): void => {
-    const accountInfo = `${account.email} (${account.linkedProviders.join(", ")})`;
+    const accountInfo = `${account.email}\n@(${account.serverUrl})`;
 
     log(accountInfo);
   });

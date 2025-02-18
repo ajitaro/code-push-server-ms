@@ -29,6 +29,7 @@ export enum CommandType {
   logout,
   organizationAdd,
   organizationList,
+  organizationRemove,
   patch,
   promote,
   register,
