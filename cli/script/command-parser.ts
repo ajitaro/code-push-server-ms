@@ -148,10 +148,10 @@ function appRemove(commandName: string, yargs: yargs.Argv): void {
 function listCollaborators(commandName: string, yargs: yargs.Argv): void {
   isValidCommand = true;
   yargs
-    .usage(USAGE_PREFIX + " collaborator " + commandName + " <organization> <appName> [options]")
-    .demand(/*count*/ 2, /*max*/ 2) // Require exactly one non-option arguments
-    .example("collaborator " + commandName + " MyOrg MyApp", 'Lists the collaborators for app "MyApp" in tabular format')
-    .example("collaborator " + commandName + " MyOrg MyApp --format json", 'Lists the collaborators for app "MyApp" in JSON format')
+    .usage(USAGE_PREFIX + " collaborator " + commandName + " <organization> [options]")
+    .demand(/*count*/ 1, /*max*/ 1) // Require exactly one non-option arguments
+    .example("collaborator " + commandName + " MyOrg", 'Lists the collaborators for org "Myorg" in tabular format')
+    .example("collaborator " + commandName + " MyOrg --format json", 'Lists the collaborators for org "Myorg" in JSON format')
     .option("format", {
       default: "table",
       demand: false,
@@ -165,9 +165,9 @@ function listCollaborators(commandName: string, yargs: yargs.Argv): void {
 function removeCollaborator(commandName: string, yargs: yargs.Argv): void {
   isValidCommand = true;
   yargs
-    .usage(USAGE_PREFIX + " collaborator " + commandName + " <organization> <appName> <email>")
-    .demand(/*count*/ 3, /*max*/ 3) // Require exactly two non-option arguments
-    .example("collaborator " + commandName + " MyOrg MyApp foo@bar.com", 'Removes foo@bar.com as a collaborator from app "MyApp"');
+    .usage(USAGE_PREFIX + " collaborator " + commandName + " <organization> <email>")
+    .demand(/*count*/ 2, /*max*/ 2) // Require exactly two non-option arguments
+    .example("collaborator " + commandName + " MyOrg foo@bar.com", 'Removes foo@bar.com as a collaborator from org "MyOrg"');
 
   addCommonConfiguration(yargs);
 }
@@ -340,16 +340,16 @@ yargs
       .command("add", "Add a new collaborator to an app", (yargs: yargs.Argv): void => {
         isValidCommand = true;
         yargs
-          .usage(USAGE_PREFIX + " collaborator add <organization> <appName> <email>")
-          .demand(/*count*/ 3, /*max*/ 3) // Require exactly two non-option arguments
-          .example("collaborator add MyOrg MyApp foo@bar.com", 'Adds foo@bar.com as a collaborator to app "MyApp"');
+          .usage(USAGE_PREFIX + " collaborator add <organization> <email>")
+          .demand(/*count*/ 2, /*max*/ 2) // Require exactly two non-option arguments
+          .example("collaborator add Myorganization foo@bar.com", 'Adds foo@bar.com as a collaborator to organization "Myorganization"');
 
         addCommonConfiguration(yargs);
       })
-      .command("remove", "Remove a collaborator from an app", (yargs: yargs.Argv) => removeCollaborator("remove", yargs))
-      .command("rm", "Remove a collaborator from an app", (yargs: yargs.Argv) => removeCollaborator("rm", yargs))
-      .command("list", "List the collaborators for an app", (yargs: yargs.Argv) => listCollaborators("list", yargs))
-      .command("ls", "List the collaborators for an app", (yargs: yargs.Argv) => listCollaborators("ls", yargs))
+      .command("remove", "Remove a collaborator from an organization", (yargs: yargs.Argv) => removeCollaborator("remove", yargs))
+      .command("rm", "Remove a collaborator from an organization", (yargs: yargs.Argv) => removeCollaborator("rm", yargs))
+      .command("list", "List the collaborators for an organization", (yargs: yargs.Argv) => listCollaborators("list", yargs))
+      .command("ls", "List the collaborators for an organization", (yargs: yargs.Argv) => listCollaborators("ls", yargs))
       .check((argv: any, aliases: { [aliases: string]: string }): any => isValidCommand); // Report unrecognized, non-hyphenated command category.
 
     addCommonConfiguration(yargs);
@@ -1035,37 +1035,34 @@ export function createCommand(): cli.ICommand {
       case "collaborator":
         switch (arg1) {
           case "add":
-            if (arg2 && arg3 && arg4) {
+            if (arg2 && arg3) {
               cmd = { type: cli.CommandType.collaboratorAdd };
 
               const collaboratorAddCommand = <cli.ICollaboratorAddCommand>cmd;
 
               collaboratorAddCommand.orgName = arg2;
-              collaboratorAddCommand.appName = arg3;
-              collaboratorAddCommand.email = arg4;
+              collaboratorAddCommand.email = arg3;
             }
             break;
 
           case "list":
           case "ls":
-            if (arg2 && arg3) {
+            if (arg2) {
               cmd = { type: cli.CommandType.collaboratorList };
 
               const collaboratorListCommand = <cli.ICollaboratorListCommand>cmd;
 
               collaboratorListCommand.orgName = arg2;
-              collaboratorListCommand.appName = arg3;
               collaboratorListCommand.format = argv["format"] as any;
             }
             break;
 
           case "remove":
           case "rm":
-            if (arg2 && arg3) {
+            if (arg2) {
               cmd = { type: cli.CommandType.collaboratorRemove };
 
-              (<cli.ICollaboratorRemoveCommand>cmd).appName = arg2;
-              (<cli.ICollaboratorAddCommand>cmd).email = arg3;
+              (<cli.ICollaboratorAddCommand>cmd).email = arg2;
             }
             break;
         }

@@ -257,20 +257,20 @@ class AccountManager {
   }
 
   // Collaborators
-  public getCollaborators(appName: string, orgName: string): Promise<CollaboratorMap> {
-    return this.get(urlEncode([`/apps/${orgName}/${appName}/collaborators`])).then((res: JsonResponse) => res.body.collaborators);
+  public getCollaborators(orgName: string): Promise<CollaboratorMap> {
+    return this.get(urlEncode([`/apps/${orgName}/collaborators`])).then((res: JsonResponse) => res.body.collaborators);
   }
 
-  public addCollaborator(appName: string, email: string, orgName: string): Promise<void> {
+  public addCollaborator(email: string, orgName: string): Promise<void> {
     return this.post(
-      urlEncode([`/apps/${orgName}/${appName}/collaborators/${email}`]),
+      urlEncode([`/apps/${orgName}/collaborators/${email}`]),
       /*requestBody=*/ null,
       /*expectResponseBody=*/ false
     ).then(() => null);
   }
 
-  public removeCollaborator(appName: string, email: string, orgName: string): Promise<void> {
-    return this.del(urlEncode([`/apps/${orgName}/${appName}/collaborators/${email}`])).then(() => null);
+  public removeCollaborator(email: string, orgName: string): Promise<void> {
+    return this.del(urlEncode([`/apps/${orgName}/collaborators/${email}`])).then(() => null);
   }
 
   // Deployments

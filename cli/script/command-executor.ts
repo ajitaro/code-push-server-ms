@@ -243,15 +243,15 @@ function appTransfer(command: cli.IAppTransferCommand): Promise<void> {
 function addCollaborator(command: cli.ICollaboratorAddCommand): Promise<void> {
   throwForInvalidEmail(command.email);
 
-  return sdk.addCollaborator(command.appName, command.email, command.orgName).then((): void => {
-    log('Successfully added "' + command.email + '" as a collaborator to the app "' + command.appName + '".');
+  return sdk.addCollaborator(command.email, command.orgName).then((): void => {
+    log('Successfully added "' + command.email + '" as a collaborator to the app "' + command.orgName + '".');
   });
 }
 
 function listCollaborators(command: cli.ICollaboratorListCommand): Promise<void> {
   throwForInvalidOutputFormat(command.format);
 
-  return sdk.getCollaborators(command.appName, command.orgName).then((retrievedCollaborators: CollaboratorMap): void => {
+  return sdk.getCollaborators(command.orgName).then((retrievedCollaborators: CollaboratorMap): void => {
     printCollaboratorsList(command.format, retrievedCollaborators);
   });
 }
@@ -261,8 +261,8 @@ function removeCollaborator(command: cli.ICollaboratorRemoveCommand): Promise<vo
 
   return confirm().then((wasConfirmed: boolean): Promise<void> => {
     if (wasConfirmed) {
-      return sdk.removeCollaborator(command.appName, command.email, command.orgName).then((): void => {
-        log('Successfully removed "' + command.email + '" as a collaborator from the app "' + command.appName + '".');
+      return sdk.removeCollaborator(command.email, command.orgName).then((): void => {
+        log('Successfully removed "' + command.email + '" as a collaborator from the app "' + command.orgName + '".');
       });
     }
 
@@ -721,8 +721,9 @@ function printAppList(format: string, apps: App[]): void {
   }
 }
 
-function getCollaboratorDisplayName(email: string, collaboratorProperties: CollaboratorProperties): string {
-  return collaboratorProperties.permission === AccountManager.AppPermission.OWNER ? email + chalk.magenta(" (Owner)") : email;
+function getCollaboratorDisplayRole(collaboratorProperties: CollaboratorProperties): string {
+  const permission = collaboratorProperties.permission
+  return permission === AccountManager.AppPermission.OWNER ? chalk.magenta(permission) : permission;
 }
 
 function printCollaboratorsList(format: string, collaborators: CollaboratorMap): void {
@@ -730,10 +731,11 @@ function printCollaboratorsList(format: string, collaborators: CollaboratorMap):
     const dataSource = { collaborators: collaborators };
     printJson(dataSource);
   } else if (format === "table") {
-    const headers = ["E-mail Address"];
+    const headers = ["E-mail", "Role"];
     printTable(headers, (dataSource: any[]): void => {
       Object.keys(collaborators).forEach((email: string): void => {
-        const row = [getCollaboratorDisplayName(email, collaborators[email])];
+        const roleRow = getCollaboratorDisplayRole(collaborators[email]);
+        const row: string[] = [email, roleRow];
         dataSource.push(row);
       });
     });
