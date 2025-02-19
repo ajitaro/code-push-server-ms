@@ -233,6 +233,7 @@ export interface IRollbackCommand extends ICommand {
   appName: string;
   deploymentName: string;
   targetRelease: string;
+  orgName: string;
 }
 
 export interface ISessionListCommand extends ICommand {

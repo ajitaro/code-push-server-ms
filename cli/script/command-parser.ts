@@ -238,9 +238,9 @@ function deploymentList(commandName: string, yargs: yargs.Argv): void {
 function deploymentRemove(commandName: string, yargs: yargs.Argv): void {
   isValidCommand = true;
   yargs
-    .usage(USAGE_PREFIX + " deployment " + commandName + " <appName> <deploymentName>")
-    .demand(/*count*/ 2, /*max*/ 2) // Require exactly two non-option arguments
-    .example("deployment " + commandName + " MyApp MyDeployment", 'Removes deployment "MyDeployment" from app "MyApp"');
+    .usage(USAGE_PREFIX + " deployment " + commandName + " <organization> <appName> <deploymentName>")
+    .demand(/*count*/ 3, /*max*/ 3) // Require exactly two non-option arguments
+    .example("deployment " + commandName + " MyOrg MyApp MyDeployment", 'Removes deployment "MyDeployment" from app "MyApp"');
 
   addCommonConfiguration(yargs);
 }
@@ -248,14 +248,14 @@ function deploymentRemove(commandName: string, yargs: yargs.Argv): void {
 function deploymentHistory(commandName: string, yargs: yargs.Argv): void {
   isValidCommand = true;
   yargs
-    .usage(USAGE_PREFIX + " deployment " + commandName + " <appName> <deploymentName> [options]")
+    .usage(USAGE_PREFIX + " deployment " + commandName + " <organization> <appName> <deploymentName> [options]")
     .demand(/*count*/ 2, /*max*/ 2) // Require exactly two non-option arguments
     .example(
-      "deployment " + commandName + " MyApp MyDeployment",
+      "deployment " + commandName + " MyOrg MyApp MyDeployment",
       'Displays the release history for deployment "MyDeployment" from app "MyApp" in tabular format'
     )
     .example(
-      "deployment " + commandName + " MyApp MyDeployment --format json",
+      "deployment " + commandName + " MyOrg MyApp MyDeployment --format json",
       'Displays the release history for deployment "MyDeployment" from app "MyApp" in JSON format'
     )
     .option("format", {
@@ -373,9 +373,9 @@ yargs
       .command("add", "Add a new deployment to an app", (yargs: yargs.Argv): void => {
         isValidCommand = true;
         yargs
-          .usage(USAGE_PREFIX + " deployment add <appName> <deploymentName>")
-          .demand(/*count*/ 2, /*max*/ 2) // Require exactly two non-option arguments
-          .example("deployment add MyApp MyDeployment", 'Adds deployment "MyDeployment" to app "MyApp"');
+          .usage(USAGE_PREFIX + " deployment add <organization> <appName> <deploymentName>")
+          .demand(/*count*/ 3, /*max*/ 3) // Require exactly two non-option arguments
+          .example("deployment add MyOrg MyApp MyDeployment", 'Adds deployment "MyDeployment" to app "MyApp"');
 
         addCommonConfiguration(yargs);
       })
@@ -387,10 +387,10 @@ yargs
       .command("rename", "Rename an existing deployment", (yargs: yargs.Argv) => {
         isValidCommand = true;
         yargs
-          .usage(USAGE_PREFIX + " deployment rename <appName> <currentDeploymentName> <newDeploymentName>")
-          .demand(/*count*/ 3, /*max*/ 3) // Require exactly three non-option arguments
+          .usage(USAGE_PREFIX + " deployment rename <organization> <appName> <currentDeploymentName> <newDeploymentName>")
+          .demand(/*count*/ 4, /*max*/ 4) // Require exactly three non-option arguments
           .example(
-            "deployment rename MyApp CurrentDeploymentName NewDeploymentName",
+            "deployment rename MyOrg MyApp CurrentDeploymentName NewDeploymentName",
             'Renames deployment "CurrentDeploymentName" to "NewDeploymentName"'
           );
 
@@ -481,14 +481,14 @@ yargs
   })
   .command("patch", "Update the metadata for an existing release", (yargs: yargs.Argv) => {
     yargs
-      .usage(USAGE_PREFIX + " patch <appName> <deploymentName> [options]")
-      .demand(/*count*/ 2, /*max*/ 2) // Require exactly two non-option arguments
+      .usage(USAGE_PREFIX + " patch <organization> <appName> <deploymentName> [options]")
+      .demand(/*count*/ 3, /*max*/ 3) // Require exactly two non-option arguments
       .example(
-        'patch MyApp Production --des "Updated description" -r 50%',
+        'patch MyOrg MyApp Production --des "Updated description" -r 50%',
         'Updates the description of the latest release for "MyApp" app\'s "Production" deployment and updates the rollout value to 50%'
       )
       .example(
-        'patch MyApp Production -l v3 --des "Updated description for v3"',
+        'patch MyOrg MyApp Production -l v3 --des "Updated description for v3"',
         'Updates the description of the release with label v3 for "MyApp" app\'s "Production" deployment'
       )
       .option("label", {
@@ -867,11 +867,11 @@ yargs
   })
   .command("rollback", "Rollback the latest release for an app deployment", (yargs: yargs.Argv) => {
     yargs
-      .usage(USAGE_PREFIX + " rollback <appName> <deploymentName> [options]")
-      .demand(/*count*/ 2, /*max*/ 2) // Require exactly two non-option arguments
-      .example("rollback MyApp Production", 'Performs a rollback on the "Production" deployment of "MyApp"')
+      .usage(USAGE_PREFIX + " rollback <organization> <appName> <deploymentName> [options]")
+      .demand(/*count*/ 3, /*max*/ 3) // Require exactly two non-option arguments
+      .example("rollback MyOrg MyApp Production", 'Performs a rollback on the "Production" deployment of "MyApp"')
       .example(
-        "rollback MyApp Production --targetRelease v4",
+        "rollback MyOrg MyApp Production --targetRelease v4",
         'Performs a rollback on the "Production" deployment of "MyApp" to the v4 release'
       )
       .option("targetRelease", {
@@ -926,6 +926,7 @@ export function createCommand(): cli.ICommand {
     const arg2: any = argv._[2];
     const arg3: any = argv._[3];
     const arg4: any = argv._[4];
+    const arg5: any = argv._[5];
 
     switch (arg0) {
       case "access-key":
@@ -1079,24 +1080,26 @@ export function createCommand(): cli.ICommand {
       case "deployment":
         switch (arg1) {
           case "add":
-            if (arg2 && arg3) {
+            if (arg2 && arg3 && arg4) {
               cmd = { type: cli.CommandType.deploymentAdd };
 
               const deploymentAddCommand = <cli.IDeploymentAddCommand>cmd;
 
-              deploymentAddCommand.appName = arg2;
-              deploymentAddCommand.deploymentName = arg3;
+              deploymentAddCommand.orgName = arg2
+              deploymentAddCommand.appName = arg3;
+              deploymentAddCommand.deploymentName = arg4;
             }
             break;
 
           case "clear":
-            if (arg2 && arg3) {
+            if (arg2 && arg3 && arg4) {
               cmd = { type: cli.CommandType.deploymentHistoryClear };
 
               const deploymentHistoryClearCommand = <cli.IDeploymentHistoryClearCommand>cmd;
 
-              deploymentHistoryClearCommand.appName = arg2;
-              deploymentHistoryClearCommand.deploymentName = arg3;
+              deploymentHistoryClearCommand.orgName = arg2;
+              deploymentHistoryClearCommand.appName = arg3;
+              deploymentHistoryClearCommand.deploymentName = arg4;
             }
             break;
 
@@ -1116,37 +1119,40 @@ export function createCommand(): cli.ICommand {
 
           case "remove":
           case "rm":
-            if (arg2 && arg3) {
+            if (arg2 && arg3 && arg4) {
               cmd = { type: cli.CommandType.deploymentRemove };
 
               const deploymentRemoveCommand = <cli.IDeploymentRemoveCommand>cmd;
 
-              deploymentRemoveCommand.appName = arg2;
-              deploymentRemoveCommand.deploymentName = arg3;
+              deploymentRemoveCommand.orgName = arg2;
+              deploymentRemoveCommand.appName = arg3;
+              deploymentRemoveCommand.deploymentName = arg4;
             }
             break;
 
           case "rename":
-            if (arg2 && arg3 && arg4) {
+            if (arg2 && arg3 && arg4 && arg5) {
               cmd = { type: cli.CommandType.deploymentRename };
 
               const deploymentRenameCommand = <cli.IDeploymentRenameCommand>cmd;
 
-              deploymentRenameCommand.appName = arg2;
-              deploymentRenameCommand.currentDeploymentName = arg3;
-              deploymentRenameCommand.newDeploymentName = arg4;
+              deploymentRenameCommand.orgName = arg2;
+              deploymentRenameCommand.appName = arg3;
+              deploymentRenameCommand.currentDeploymentName = arg4;
+              deploymentRenameCommand.newDeploymentName = arg5;
             }
             break;
 
           case "history":
           case "h":
-            if (arg2 && arg3) {
+            if (arg2 && arg3 && arg4) {
               cmd = { type: cli.CommandType.deploymentHistory };
 
               const deploymentHistoryCommand = <cli.IDeploymentHistoryCommand>cmd;
 
-              deploymentHistoryCommand.appName = arg2;
-              deploymentHistoryCommand.deploymentName = arg3;
+              deploymentHistoryCommand.orgName = arg2;
+              deploymentHistoryCommand.appName = arg3;
+              deploymentHistoryCommand.deploymentName = arg4;
               deploymentHistoryCommand.format = argv["format"] as any;
               deploymentHistoryCommand.displayAuthor = argv["displayAuthor"] as any;
             }
@@ -1201,13 +1207,14 @@ export function createCommand(): cli.ICommand {
         break;
 
       case "patch":
-        if (arg1 && arg2) {
+        if (arg1 && arg2 && arg3) {
           cmd = { type: cli.CommandType.patch };
 
           const patchCommand = <cli.IPatchCommand>cmd;
 
-          patchCommand.appName = arg1;
-          patchCommand.deploymentName = arg2;
+          patchCommand.orgName = arg1;
+          patchCommand.appName = arg2;
+          patchCommand.deploymentName = arg3;
           patchCommand.label = argv["label"] as any;
           // Description must be set to null to indicate that it is not being patched.
           patchCommand.description = argv["description"] ? backslash(argv["description"]) : null;
@@ -1300,13 +1307,14 @@ export function createCommand(): cli.ICommand {
         break;
 
       case "rollback":
-        if (arg1 && arg2) {
+        if (arg1 && arg2 && arg3) {
           cmd = { type: cli.CommandType.rollback };
 
           const rollbackCommand = <cli.IRollbackCommand>cmd;
 
-          rollbackCommand.appName = arg1;
-          rollbackCommand.deploymentName = arg2;
+          rollbackCommand.orgName = arg1;
+          rollbackCommand.appName = arg2;
+          rollbackCommand.deploymentName = arg3;
           rollbackCommand.targetRelease = argv["targetRelease"] as any;
         }
         break;
