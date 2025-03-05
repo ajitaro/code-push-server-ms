@@ -34,6 +34,7 @@ export enum CommandType {
   patch,
   promote,
   register,
+  easyRegister,
   release,
   releaseReact,
   rollback,
@@ -165,7 +166,7 @@ export interface ILoginCommand extends ICommand {
   accessKey: string;
 }
 
-export interface IEasyLoginCommand extends ICommand {
+export interface IEasyAuthCommand extends ICommand {
   email: string;
   password: string;
   serverUrl?: string;

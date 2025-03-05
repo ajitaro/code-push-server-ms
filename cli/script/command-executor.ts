@@ -444,6 +444,7 @@ export function execute(command: cli.ICommand) {
       case cli.CommandType.login:
       case cli.CommandType.register:
       case cli.CommandType.easyLogin:
+      case cli.CommandType.easyRegister:
         if (connectionInfo) {
           throw new Error("You are already logged in from this machine.");
         }
@@ -532,7 +533,7 @@ export function execute(command: cli.ICommand) {
         return login(<cli.ILoginCommand>command);
 
       case cli.CommandType.easyLogin:
-        return easyLogin(<cli.IEasyLoginCommand>command);
+        return easyLogin(<cli.IEasyAuthCommand>command);
 
       case cli.CommandType.logout:
         return logout(command);
@@ -554,6 +555,9 @@ export function execute(command: cli.ICommand) {
 
       case cli.CommandType.register:
         return register(<cli.IRegisterCommand>command);
+
+      case cli.CommandType.easyRegister:
+        return easyRegister(<cli.IEasyAuthCommand>command);
 
       case cli.CommandType.release:
         return release(<cli.IReleaseCommand>command);
@@ -643,7 +647,7 @@ function loginWithExternalAuthentication(action: string, serverUrl?: string): Pr
   });
 }
 
-async function easyLogin(command: cli.IEasyLoginCommand) {
+async function easyLogin(command: cli.IEasyAuthCommand) {
   try {
     const res: any = await getToken(command.serverUrl, command.email, command.password);
     const token = res?.results?.tokens;
@@ -663,6 +667,27 @@ async function easyLogin(command: cli.IEasyLoginCommand) {
     }
   } catch (error: any) {
     throw error;
+  }
+}
+
+async function easyRegister(command: cli.IEasyAuthCommand) {
+  try {
+    const response = await superagent
+      .post(`${command.serverUrl}/users/easy-register`)
+      .set("Content-Type", "application/json")
+      .send({ email: command.email, password: command.password });
+      
+    if (!response.body || response.status !== 200) {
+      throw new Error(response.body?.message || "Failed to register.");
+    }
+
+    return response.body;
+  } catch (error: any) {
+    if (error.response && error.response.body) {
+      throw new Error(error.response.body.message);
+    }
+
+    throw new Error("An unexpected error occurred.");
   }
 }
 
