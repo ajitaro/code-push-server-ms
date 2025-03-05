@@ -435,6 +435,25 @@ yargs
 
     addCommonConfiguration(yargs);
   })
+  .command("easy-login", "Authenticate with the CodePush server in order to begin managing your apps", (yargs: yargs.Argv) => {
+    isValidCommandCategory = true;
+    isValidCommand = true;
+    yargs
+      .usage(USAGE_PREFIX + " easy-login [options]")
+      .demand(/*count*/ 2, /*max*/ 3) //set 'max' to one to allow usage of serverUrl undocument parameter for testing
+      .example("easy-login http://localhost:3000 mail@mail.com --password=your-password", "Logs in a user")
+      .option("password", {
+        alias: "p",
+        default: null,
+        demand: true,
+        description:
+          "Your account password",
+        type: "string",
+      })
+      .check((argv: any, aliases: { [aliases: string]: string }): any => isValidCommand); // Report unrecognized, non-hyphenated command category.
+
+    addCommonConfiguration(yargs);
+  })
   .command("logout", "Log out of the current session", (yargs: yargs.Argv) => {
     isValidCommandCategory = true;
     isValidCommand = true;
@@ -1174,6 +1193,16 @@ export function createCommand(): cli.ICommand {
 
         loginCommand.serverUrl = getServerUrl(arg1);
         loginCommand.accessKey = argv["accessKey"] as any;
+        break;
+
+      case "easy-login":
+        cmd = { type: cli.CommandType.easyLogin };
+
+        const easyLoginCommand = <cli.IEasyLoginCommand>cmd;
+
+        easyLoginCommand.serverUrl = getServerUrl(arg1);
+        easyLoginCommand.email = arg2;
+        easyLoginCommand.password = argv["password"] as any;
         break;
 
       case "logout":

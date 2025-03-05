@@ -97,6 +97,23 @@ export interface Account {
   serverUrl: string;
 }
 
+export interface ResToken {
+  status: number
+  results: {
+    tokens: string
+  }
+}
+
+export interface AccessKeyResponse {
+  status: number;
+  accessKey: {
+    createdTime: number;
+    expires: number;
+    name: string;
+    friendlyName: string;
+  };
+}
+
 export interface Organization {
   orgName: string;
   name: string;

@@ -28,7 +28,7 @@ import {
   Session,
 } from "./types";
 import { IAppAddCommand } from "./types/cli";
-import { Organization } from "./types/rest-definitions";
+import { Organization, ResToken } from "./types/rest-definitions";
 
 import packageJson from "../package.json";
 
@@ -118,7 +118,7 @@ class AccountManager {
     const accessKeyRequest: AccessKeyRequest = {
       createdBy: os.hostname(),
       friendlyName,
-      ttl,
+      ttl: ttl || 60*60*24*30*1000,
     };
 
     return this.post(urlEncode(["/accessKeys/"]), JSON.stringify(accessKeyRequest), /*expectResponseBody=*/ true).then(
@@ -208,6 +208,26 @@ class AccountManager {
   public getAccountInfo(): Promise<Account> {
     return this.get(urlEncode(["/account"])).then((res: JsonResponse) => res.body.account);
   }
+
+  public login(): Promise<string> {
+    return this.get(urlEncode(["/auth/login"])).then((res: JsonResponse) => res.body.results.token);
+  }
+
+public getToken(account: string, password: string): Promise<ResToken> {
+  const body = JSON.stringify({ account, password });
+
+  return this.post(urlEncode(["/auth/login"]), body, /*expectResponseBody=*/ true)
+    .then((res: JsonResponse) => {      
+      if (!res || !res.body.results) {
+        throw new Error(res.body.message || "Invalid response from the server.");
+      }
+      return res.body;
+    })
+    .catch((error) => {
+      throw new Error(error instanceof Error ? error.message : error);
+    });
+}
+
 
   // Organizations
   public getOrganizations(): Promise<Organization[]> {

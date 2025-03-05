@@ -26,6 +26,7 @@ export enum CommandType {
   deploymentRename,
   link,
   login,
+  easyLogin,
   logout,
   organizationAdd,
   organizationList,
@@ -162,6 +163,12 @@ export interface ILinkCommand extends ICommand {
 export interface ILoginCommand extends ICommand {
   serverUrl?: string;
   accessKey: string;
+}
+
+export interface IEasyLoginCommand extends ICommand {
+  email: string;
+  password: string;
+  serverUrl?: string;
 }
 
 export interface IOrganizationCommand extends ICommand {

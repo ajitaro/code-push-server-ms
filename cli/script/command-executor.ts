@@ -23,6 +23,7 @@ import wordwrap = require("wordwrap");
 import * as cli from "../script/types/cli";
 import sign from "./sign";
 const xcode = require("xcode");
+import superagent = require("superagent");
 import {
   AccessKey,
   Account,
@@ -55,7 +56,7 @@ const emailValidator = require("email-validator");
 import packageJson from "../package.json";
 const parseXml = Q.denodeify(require("xml2js").parseString);
 import Promise = Q.Promise;
-import { Organization } from "./types/rest-definitions";
+import { AccessKeyRequest, AccessKeyResponse, Organization } from "./types/rest-definitions";
 const properties = require("properties");
 const Spinner = require("cli-spinner").Spinner;
 
@@ -442,6 +443,7 @@ export function execute(command: cli.ICommand) {
       // Must not be logged in
       case cli.CommandType.login:
       case cli.CommandType.register:
+      case cli.CommandType.easyLogin:
         if (connectionInfo) {
           throw new Error("You are already logged in from this machine.");
         }
@@ -528,6 +530,9 @@ export function execute(command: cli.ICommand) {
 
       case cli.CommandType.login:
         return login(<cli.ILoginCommand>command);
+
+      case cli.CommandType.easyLogin:
+        return easyLogin(<cli.IEasyLoginCommand>command);
 
       case cli.CommandType.logout:
         return logout(command);
@@ -637,6 +642,30 @@ function loginWithExternalAuthentication(action: string, serverUrl?: string): Pr
     });
   });
 }
+
+async function easyLogin(command: cli.IEasyLoginCommand) {
+  try {
+    const res: any = await getToken(command.serverUrl, command.email, command.password);
+    const token = res?.results?.tokens;
+    const headers: Headers = {
+      ...CLI_HEADERS,
+      Authorization: `Bearer ${token}`,
+    };
+
+    const accessKey = await addAccessKey(command.serverUrl, command.email, token);
+    const newSdk = getSdk(accessKey.key!, headers, command.serverUrl!);
+    const isAuthenticated = await newSdk.isAuthenticated();
+    
+    if (isAuthenticated) {
+      serializeConnectionInfo(accessKey.key!, /*preserveAccessKeyOnLogout*/ true, command.serverUrl, command.email);
+    } else {
+      throw new Error("Invalid access key.");
+    }
+  } catch (error: any) {
+    throw error;
+  }
+}
+
 
 function logout(command: cli.ICommand): Promise<void> {
   return Q(<void>null)
@@ -1485,6 +1514,63 @@ function requestAccessKey(): Promise<string> {
   });
 }
 
+async function getToken(serverUrl: string = "http://localhost:3000", account: string, password: string) {
+  try {
+    const response = await superagent
+      .post(`${serverUrl}/auth/login`)
+      .set("Content-Type", "application/json")
+      .send({ account, password });
+    if (!response.body || response.status !== 200) {
+      throw new Error(response.body?.message || "Failed to authenticate.");
+    }
+
+    return response.body;
+  } catch (error: unknown) {
+    throw error;
+  }
+}
+
+async function addAccessKey(serverUrl: string = "http://localhost:3000", friendlyName: string, authToken: string, ttl: number = 60 * 60 * 24 * 30 * 1000) {
+  if (!friendlyName) {
+    throw new Error("A name must be specified when adding an access key.");
+  }
+
+  if (!authToken) {
+    throw new Error("Authentication token is required.");
+  }
+
+  const time = new Date().getTime();
+
+  const accessKeyRequest: AccessKeyRequest = {
+    createdBy: os.hostname(),
+    friendlyName: "Login-" + time,
+    ttl,
+  };
+
+  try {
+    const response = await superagent
+      .post(`${serverUrl}/accessKeys/`)
+      .set("Content-Type", "application/json")
+      .set("Authorization", `Bearer ${authToken}`)
+      .send(accessKeyRequest);
+
+    const data: AccessKeyResponse = response.body;
+
+    if (!response.ok || !data.accessKey) {
+      throw new Error("Failed to create access key.");
+    }
+
+    return {
+      createdTime: data.accessKey.createdTime,
+      expires: data.accessKey.expires,
+      key: data.accessKey.name,
+      name: data.accessKey.friendlyName,
+    };
+  } catch (error: unknown) {
+    throw error;
+  }
+}
+
 export const runReactNativeBundleCommand = (
   bundleName: string,
   development: boolean,
@@ -1550,7 +1636,7 @@ export const runReactNativeBundleCommand = (
   });
 };
 
-function serializeConnectionInfo(accessKey: string, preserveAccessKeyOnLogout: boolean, customServerUrl?: string): void {
+function serializeConnectionInfo(accessKey: string, preserveAccessKeyOnLogout: boolean, customServerUrl?: string, email?: string): void {
   const connectionInfo: ILoginConnectionInfo = {
     accessKey: accessKey,
     preserveAccessKeyOnLogout: preserveAccessKeyOnLogout,
@@ -1563,7 +1649,7 @@ function serializeConnectionInfo(accessKey: string, preserveAccessKeyOnLogout: b
   fs.writeFileSync(configFilePath, json, { encoding: "utf8" });
 
   log(
-    `\r\nSuccessfully logged-in. Your session file was written to ${chalk.cyan(configFilePath)}. You can run the ${chalk.cyan(
+    `\r\nSuccessfully logged-in to ${chalk.cyan(customServerUrl)} as ${chalk.cyan(email)}. Your session file was written to ${chalk.cyan(configFilePath)}. You can run the ${chalk.cyan(
       "code-push logout"
     )} command at any time to delete this file and terminate your session.\r\n`
   );
@@ -1637,7 +1723,7 @@ function isCommandOptionSpecified(option: any): boolean {
 }
 
 function getSdk(accessKey: string, headers: Headers, customServerUrl: string): AccountManager {
-  const sdk: any = new AccountManager(accessKey, CLI_HEADERS, customServerUrl);
+  const sdk: any = new AccountManager(accessKey, headers, customServerUrl);
   /*
    * If the server returns `Unauthorized`, it must be due to an invalid
    * (or expired) access key. For convenience, we patch every SDK call
