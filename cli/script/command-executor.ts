@@ -651,6 +651,10 @@ async function easyLogin(command: cli.IEasyAuthCommand) {
   try {
     const res: any = await getToken(command.serverUrl, command.email, command.password);
     const token = res?.results?.tokens;
+
+    if (res.status === 'ERROR') {
+      throw new Error(res.message);
+    }
     const headers: Headers = {
       ...CLI_HEADERS,
       Authorization: `Bearer ${token}`,
