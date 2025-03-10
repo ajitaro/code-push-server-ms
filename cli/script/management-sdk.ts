@@ -616,7 +616,7 @@ public getToken(account: string, password: string): Promise<ResToken> {
     request.set("Accept", `application/vnd.code-push.v${AccountManager.API_VERSION}+json`);
     request.set("Authorization", `Bearer ${this._accessKey}`);
     request.set("X-CodePush-SDK-Version", packageJson.version);
-    request.set("API_KEY", this._apiKey);
+    request.set("API-Key", this._apiKey);
   }
 }
 

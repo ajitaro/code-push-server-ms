@@ -680,6 +680,7 @@ async function easyRegister(command: cli.IEasyAuthCommand) {
     const response = await superagent
       .post(`${command.serverUrl}/users/easy-register`)
       .set("Content-Type", "application/json")
+      .set("API-Key", command.apiKey)
       .send({ email: command.email, password: command.password });
       
     if (!response.body || response.status !== 200) {

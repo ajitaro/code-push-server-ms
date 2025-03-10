@@ -1309,6 +1309,7 @@ export function createCommand(): cli.ICommand {
 
         easyRegisterCommand.serverUrl = getServerUrl(arg1);
         easyRegisterCommand.email = arg2;
+        easyRegisterCommand.apiKey = argv["apiKey"] as any;
         easyRegisterCommand.password = argv["password"] as any;
         break;
 
