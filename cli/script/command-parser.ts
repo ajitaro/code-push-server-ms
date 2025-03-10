@@ -1221,6 +1221,7 @@ export function createCommand(): cli.ICommand {
 
         easyLoginCommand.serverUrl = getServerUrl(arg1);
         easyLoginCommand.email = arg2;
+        easyLoginCommand.apiKey = argv["apiKey"] as any;
         easyLoginCommand.password = argv["password"] as any;
         break;
 

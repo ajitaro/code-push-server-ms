@@ -73,6 +73,7 @@ interface ILoginConnectionInfo {
   accessKey: string;
   customServerUrl?: string; // A custom serverUrl for internal debugging purposes
   preserveAccessKeyOnLogout?: boolean;
+  apiKey?: string
 }
 
 export interface UpdateMetricsWithTotalActive extends UpdateMetrics {
@@ -464,7 +465,7 @@ export function execute(command: cli.ICommand) {
           );
         }
 
-        sdk = getSdk(connectionInfo.accessKey, CLI_HEADERS, connectionInfo.customServerUrl);
+        sdk = getSdk(connectionInfo.accessKey, CLI_HEADERS, connectionInfo.customServerUrl, connectionInfo.apiKey);
         break;
     }
 
@@ -612,7 +613,7 @@ function link(command: cli.ILinkCommand): Promise<void> {
 function login(command: cli.ILoginCommand): Promise<void> {
   // Check if one of the flags were provided.
   if (command.accessKey) {
-    sdk = getSdk(command.accessKey, CLI_HEADERS, command.serverUrl);
+    sdk = getSdk(command.accessKey, CLI_HEADERS, command.serverUrl, command.apiKey);
     return sdk.isAuthenticated().then((isAuthenticated: boolean): void => {
       if (isAuthenticated) {
         serializeConnectionInfo(command.accessKey, /*preserveAccessKeyOnLogout*/ true, command.serverUrl);
@@ -625,7 +626,7 @@ function login(command: cli.ILoginCommand): Promise<void> {
   }
 }
 
-function loginWithExternalAuthentication(action: string, serverUrl?: string): Promise<void> {
+function loginWithExternalAuthentication(action: string, serverUrl?: string, apiKey?: string): Promise<void> {
   initiateExternalAuthenticationAsync(action, serverUrl);
   log(""); // Insert newline
 
@@ -635,7 +636,7 @@ function loginWithExternalAuthentication(action: string, serverUrl?: string): Pr
       return;
     }
 
-    sdk = getSdk(accessKey, CLI_HEADERS, serverUrl);
+    sdk = getSdk(accessKey, CLI_HEADERS, serverUrl, apiKey);
 
     return sdk.isAuthenticated().then((isAuthenticated: boolean): void => {
       if (isAuthenticated) {
@@ -661,7 +662,7 @@ async function easyLogin(command: cli.IEasyAuthCommand) {
     };
 
     const accessKey = await addAccessKey(command.serverUrl, command.email, token);
-    const newSdk = getSdk(accessKey.key!, headers, command.serverUrl!);
+    const newSdk = getSdk(accessKey.key!, headers, command.serverUrl!, command.apiKey!);
     const isAuthenticated = await newSdk.isAuthenticated();
     
     if (isAuthenticated) {
@@ -1790,8 +1791,8 @@ function isCommandOptionSpecified(option: any): boolean {
   return option !== undefined && option !== null;
 }
 
-function getSdk(accessKey: string, headers: Headers, customServerUrl: string): AccountManager {
-  const sdk: any = new AccountManager(accessKey, headers, customServerUrl);
+function getSdk(accessKey: string, headers: Headers, customServerUrl: string, apiKey: string): AccountManager {
+  const sdk: any = new AccountManager(accessKey, headers, customServerUrl, apiKey);
   /*
    * If the server returns `Unauthorized`, it must be due to an invalid
    * (or expired) access key. For convenience, we patch every SDK call

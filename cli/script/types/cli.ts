@@ -164,12 +164,14 @@ export interface ILinkCommand extends ICommand {
 export interface ILoginCommand extends ICommand {
   serverUrl?: string;
   accessKey: string;
+  apiKey?: string;
 }
 
 export interface IEasyAuthCommand extends ICommand {
   email: string;
   password: string;
   serverUrl?: string;
+  apiKey?: string;
 }
 
 export interface IOrganizationCommand extends ICommand {

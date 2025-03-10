@@ -74,13 +74,15 @@ class AccountManager {
   private _accessKey: string;
   private _serverUrl: string;
   private _customHeaders: Headers;
+  private _apiKey: string;
 
-  constructor(accessKey: string, customHeaders?: Headers, serverUrl?: string) {
+  constructor(accessKey: string, customHeaders?: Headers, serverUrl?: string, apiKey?: string) {
     if (!accessKey) throw new Error("An access key must be specified.");
 
     this._accessKey = accessKey;
     this._customHeaders = customHeaders;
     this._serverUrl = serverUrl || AccountManager.SERVER_URL;
+    this._apiKey = apiKey || "";
   }
 
   public get accessKey(): string {
@@ -614,6 +616,7 @@ public getToken(account: string, password: string): Promise<ResToken> {
     request.set("Accept", `application/vnd.code-push.v${AccountManager.API_VERSION}+json`);
     request.set("Authorization", `Bearer ${this._accessKey}`);
     request.set("X-CodePush-SDK-Version", packageJson.version);
+    request.set("API_KEY", this._apiKey);
   }
 }
 
