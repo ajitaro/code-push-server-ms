@@ -365,40 +365,6 @@ public getToken(account: string, password: string): Promise<ResToken> {
           });
       });
 
-      // 🟢 1️⃣ Check File Size
-      let fileSizeInBytes = 0;
-      try {
-        const fileStats = fs.statSync(filePath);
-        fileSizeInBytes = fileStats.size;
-        console.log(chalk.yellow(`📦 File Size: ${(fileSizeInBytes / 1024).toFixed(2)} KB`));
-      } catch (error) {
-        console.error(chalk.red(`❌ Failed to get file size: ${error.message}`));
-        reject(error);
-        return;
-      }
-
-      // 🟢 2️⃣ Check Metadata Size (JSON data)
-      const metadataString = JSON.stringify(updateMetadata);
-      const metadataSizeInBytes = Buffer.byteLength(metadataString);
-      console.log(chalk.yellow(`📜 Metadata Size: ${(metadataSizeInBytes / 1024).toFixed(2)} KB`));
-
-      // 🟢 3️⃣ Check Estimated Headers Size
-      const headers = {
-        "Authorization": `Bearer ${this._accessKey}`,
-        "Content-Type": "multipart/form-data",
-      };
-      const headersSizeInBytes = Buffer.byteLength(JSON.stringify(headers));
-      console.log(chalk.yellow(`📩 Estimated Headers Size: ${(headersSizeInBytes / 1024).toFixed(2)} KB`));
-
-      // 🟢 4️⃣ Calculate Total Request Size
-      const totalRequestSize = fileSizeInBytes + metadataSizeInBytes + headersSizeInBytes;
-      console.log(chalk.green(`🚀 Total Estimated Payload Size: ${(totalRequestSize / 1024).toFixed(2)} KB`));
-
-      // Warn if request is too large
-      if (totalRequestSize > 50 * 1024 * 1024) { // Example: 50MB limit
-        console.warn(chalk.red("⚠️ Warning: Total request size exceeds 50MB. It may be rejected by the server!"));
-      }
-
       getPackageFilePromise.then((packageFile: PackageFile) => {
         const file: any = fs.createReadStream(packageFile.path);
         request
