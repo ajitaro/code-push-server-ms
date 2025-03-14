@@ -659,6 +659,7 @@ async function easyLogin(command: cli.IEasyAuthCommand) {
     const headers: Headers = {
       ...CLI_HEADERS,
       Authorization: `Bearer ${token}`,
+      'X-Dev-Token': command.apiKey || ''
     };
 
     const accessKey = await addAccessKey(command.serverUrl, command.email, token);
