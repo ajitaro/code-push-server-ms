@@ -650,7 +650,8 @@ function loginWithExternalAuthentication(action: string, serverUrl?: string, api
 
 async function easyLogin(command: cli.IEasyAuthCommand) {
   try {
-    const res: any = await getToken(command.serverUrl, command.email, command.password);
+    const apiKey = command.apiKey || "";
+    const res: any = await getToken(command.serverUrl, command.email, command.password, apiKey);
     const token = res?.results?.tokens;
 
     if (res.status === 'ERROR') {
@@ -659,10 +660,10 @@ async function easyLogin(command: cli.IEasyAuthCommand) {
     const headers: Headers = {
       ...CLI_HEADERS,
       Authorization: `Bearer ${token}`,
-      'X-Dev-Token': command.apiKey || ''
+      'X-Dev-Token': apiKey
     };
 
-    const accessKey = await addAccessKey(command.serverUrl, command.email, token);
+    const accessKey = await addAccessKey(command.serverUrl, command.email, token, undefined, apiKey);
     const newSdk = getSdk(accessKey.key!, headers, command.serverUrl!, command.apiKey!);
     const isAuthenticated = await newSdk.isAuthenticated();
     
@@ -1554,11 +1555,12 @@ function requestAccessKey(): Promise<string> {
   });
 }
 
-async function getToken(serverUrl: string = "http://localhost:3000", account: string, password: string) {
+async function getToken(serverUrl: string = "http://localhost:3000", account: string, password: string, apiKey?: string) {
   try {
     const response = await superagent
       .post(`${serverUrl}/auth/login`)
       .set("Content-Type", "application/json")
+      .set("X-Dev-Token", apiKey)
       .send({ account, password });
     if (!response.body || response.status !== 200) {
       throw new Error(response.body?.message || "Failed to authenticate.");
@@ -1570,7 +1572,7 @@ async function getToken(serverUrl: string = "http://localhost:3000", account: st
   }
 }
 
-async function addAccessKey(serverUrl: string = "http://localhost:3000", friendlyName: string, authToken: string, ttl: number = 60 * 60 * 24 * 30 * 1000) {
+async function addAccessKey(serverUrl: string = "http://localhost:3000", friendlyName: string, authToken: string, ttl: number = 60 * 60 * 24 * 30 * 1000, apiKey?: string) {
   if (!friendlyName) {
     throw new Error("A name must be specified when adding an access key.");
   }
@@ -1592,6 +1594,7 @@ async function addAccessKey(serverUrl: string = "http://localhost:3000", friendl
       .post(`${serverUrl}/accessKeys/`)
       .set("Content-Type", "application/json")
       .set("Authorization", `Bearer ${authToken}`)
+      .set("X-Dev-Token", apiKey)
       .send(accessKeyRequest);
 
     const data: AccessKeyResponse = response.body;
