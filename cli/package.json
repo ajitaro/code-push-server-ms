@@ -1,6 +1,6 @@
 {
   "name": "rupush-cli",
-  "version": "0.0.28",
+  "version": "0.0.29",
   "description": "Management CLI for the CodePush service",
   "main": ".bin/cli.js",
   "module": ".bin/cli.mjs",
