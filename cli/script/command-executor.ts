@@ -668,7 +668,7 @@ async function easyLogin(command: cli.IEasyAuthCommand) {
     const isAuthenticated = await newSdk.isAuthenticated();
     
     if (isAuthenticated) {
-      serializeConnectionInfo(accessKey.key!, /*preserveAccessKeyOnLogout*/ true, command.serverUrl, command.email);
+      serializeConnectionInfo(accessKey.key!, /*preserveAccessKeyOnLogout*/ true, command.serverUrl, command.email, apiKey);
     } else {
       throw new Error("Invalid access key.");
     }
@@ -1679,13 +1679,16 @@ export const runReactNativeBundleCommand = (
   });
 };
 
-function serializeConnectionInfo(accessKey: string, preserveAccessKeyOnLogout: boolean, customServerUrl?: string, email?: string): void {
+function serializeConnectionInfo(accessKey: string, preserveAccessKeyOnLogout: boolean, customServerUrl?: string, email?: string, apiKey?: string): void {
   const connectionInfo: ILoginConnectionInfo = {
     accessKey: accessKey,
     preserveAccessKeyOnLogout: preserveAccessKeyOnLogout,
   };
   if (customServerUrl) {
     connectionInfo.customServerUrl = customServerUrl;
+  }
+  if (apiKey) {
+    connectionInfo.apiKey = apiKey;
   }
 
   const json: string = JSON.stringify(connectionInfo);
