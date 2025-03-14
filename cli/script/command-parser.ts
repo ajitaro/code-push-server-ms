@@ -1212,6 +1212,7 @@ export function createCommand(): cli.ICommand {
 
         loginCommand.serverUrl = getServerUrl(arg1);
         loginCommand.accessKey = argv["accessKey"] as any;
+        loginCommand.apiKey = argv["apiKey"] as any;
         break;
 
       case "easy-login":

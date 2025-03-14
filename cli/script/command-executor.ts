@@ -616,7 +616,7 @@ function login(command: cli.ILoginCommand): Promise<void> {
     sdk = getSdk(command.accessKey, CLI_HEADERS, command.serverUrl, command.apiKey);
     return sdk.isAuthenticated().then((isAuthenticated: boolean): void => {
       if (isAuthenticated) {
-        serializeConnectionInfo(command.accessKey, /*preserveAccessKeyOnLogout*/ true, command.serverUrl);
+        serializeConnectionInfo(command.accessKey, /*preserveAccessKeyOnLogout*/ true, command.serverUrl, undefined, command.apiKey);
       } else {
         throw new Error("Invalid access key.");
       }
