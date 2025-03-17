@@ -1357,12 +1357,8 @@ export const release = (command: cli.IReleaseCommand): Promise<void> => {
     rollout: command.rollout,
   };
 
-  const fileStats = fs.statSync(filePath);
-  const packageSize = fileStats.size;
   log(chalk.cyan(`\Uploading package..., ${filePath}\n`));
-  log(chalk.cyan(`Package size: ${(packageSize / 1024).toFixed(2)} KB`));
   
-
   return sdk
     .isAuthenticated(true)
     .then((isAuth: boolean): Promise<void> => {

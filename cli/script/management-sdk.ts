@@ -350,7 +350,7 @@ public getToken(account: string, password: string): Promise<ResToken> {
   ): Promise<void> {
     return Promise<void>((resolve, reject, notify) => {
       updateMetadata.appVersion = targetBinaryVersion;
-      console.log(chalk.cyan(`Hiting /apps/${orgName}/${appName}/deployments/${deploymentName}/release, ${filePath}\n${updateMetadata}\n`));
+      console.log(chalk.cyan(`Hiting ${this._serverUrl}/apps/${orgName}/${appName}/deployments/${deploymentName}/release, ${filePath}\n`));
       const request: superagent.Request<any> = superagent.post(
         this._serverUrl + urlEncode([`/apps/${orgName}/${appName}/deployments/${deploymentName}/release`])
       );
@@ -385,6 +385,15 @@ public getToken(account: string, password: string): Promise<ResToken> {
 
             if (err) {
               reject(this.getCodePushError(err, res));
+              return;
+            }
+
+            if (res.text && res.text.includes("Request Rejected")) {
+              console.error("❌ Request was rejected by the server.");
+              reject(<CodePushError>{
+                message: "Request Rejected: The requested URL was rejected. Please consult with your administrator.",
+                statusCode: res && res.status,
+              });
               return;
             }
 
