@@ -350,7 +350,6 @@ public getToken(account: string, password: string): Promise<ResToken> {
   ): Promise<void> {
     return Promise<void>((resolve, reject, notify) => {
       updateMetadata.appVersion = targetBinaryVersion;
-      console.log(chalk.cyan(`Hiting ${this._serverUrl}/apps/${orgName}/${appName}/deployments/${deploymentName}/release, ${filePath}\n`));
       const request: superagent.Request<any> = superagent.post(
         this._serverUrl + urlEncode([`/apps/${orgName}/${appName}/deployments/${deploymentName}/release`])
       );
@@ -545,12 +544,9 @@ public getToken(account: string, password: string): Promise<ResToken> {
     contentType: string
   ): Promise<JsonResponse> {
     return Promise<JsonResponse>((resolve, reject, notify) => {
-      console.log(`[Request] ${method} ${endpoint}`);
       let request: superagent.Request<any> = (<any>superagent)[method](this._serverUrl + endpoint);
 
       this.attachCredentials(request);
-
-      console.log("Outgoing Request Headers:", request.header);
 
       if (requestBody) {
         if (contentType) {
