@@ -1690,36 +1690,46 @@ function serializeConnectionInfo(accessKey: string, preserveAccessKeyOnLogout: b
   const json: string = JSON.stringify(connectionInfo);
   fs.writeFileSync(configFilePath, json, { encoding: "utf8" });
   
-  const envFilePath = path.resolve(__dirname, '../../../.env');
-
-  console.log('.env File Path: ', envFilePath)
+  const projectRoot = process.cwd();
+  const envFilePath = path.join(projectRoot, '../.env');
+  console.log('.env File Path:', envFilePath);
+  
   const key = 'CODE_PUSH_ACCESS_KEY';
   let envContent = '';
-
+  
   // Read the existing .env file if it exists
   if (fs.existsSync(envFilePath)) {
       envContent = fs.readFileSync(envFilePath, 'utf8');
   }
   
   const lines = envContent.split('\n');
-    let found = false;
-    
-    // Modify the existing key if found
-    const newLines = lines.map(line => {
-        if (line.startsWith(`${key}=`)) {
-            found = true;
-            return `${key}=${accessKey}`;
-        }
-        return line;
-    });
-
-    // If key is not found, append it
-    if (!found) {
-        newLines.push(`${key}=${accessKey}`);
-    }
-
-    // Write the updated content back to .env
-    fs.writeFileSync(envFilePath, newLines.join('\n'), 'utf8');
+  let updated = false;
+  
+  // Modify the existing key if found
+  const newLines = lines.map(line => {
+      if (line.startsWith(`${key}=`)) {
+          if (line === `${key}=${accessKey}`) {
+              console.log(`${key} already exists with the same value, skipping.`);
+              updated = true; // Mark it as "handled"
+              return line; // Keep it unchanged
+          }
+          console.log(`Updating ${key} to new value: ${accessKey}`);
+          updated = true;
+          return `${key}=${accessKey}`;
+      }
+      return line;
+  });
+  
+  // If key is not found, append it
+  if (!updated) {
+      console.log(`Appending new key: ${key}=${accessKey}`);
+      newLines.push(`${key}=${accessKey}`);
+  }
+  
+  // Write the updated content back to .env
+  fs.writeFileSync(envFilePath, newLines.join('\n'), 'utf8');
+  
+  console.log('.env file updated successfully.');
 
   log(
     `\r\nSuccessfully logged-in to ${chalk.cyan(customServerUrl)} as ${chalk.cyan(email)}. Your session file was written to ${chalk.cyan(configFilePath)}. You can run the ${chalk.cyan(
