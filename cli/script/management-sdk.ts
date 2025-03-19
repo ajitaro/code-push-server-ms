@@ -545,9 +545,12 @@ public getToken(account: string, password: string): Promise<ResToken> {
     contentType: string
   ): Promise<JsonResponse> {
     return Promise<JsonResponse>((resolve, reject, notify) => {
+      console.log(`[Request] ${method} ${endpoint}`);
       let request: superagent.Request<any> = (<any>superagent)[method](this._serverUrl + endpoint);
 
       this.attachCredentials(request);
+
+      console.log("Outgoing Request Headers:", request.header);
 
       if (requestBody) {
         if (contentType) {
