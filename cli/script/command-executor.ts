@@ -446,6 +446,7 @@ export function execute(command: cli.ICommand) {
       case cli.CommandType.register:
       case cli.CommandType.easyLogin:
       case cli.CommandType.easyRegister:
+      case cli.CommandType.forgetPassword:
         if (connectionInfo) {
           throw new Error("You are already logged in from this machine.");
         }
@@ -526,6 +527,9 @@ export function execute(command: cli.ICommand) {
 
       case cli.CommandType.deploymentRename:
         return deploymentRename(<cli.IDeploymentRenameCommand>command);
+
+      case cli.CommandType.forgetPassword:
+        return forgetPassword(<cli.IForgetPasswordCommand>command);
 
       case cli.CommandType.link:
         return link(<cli.ILinkCommand>command);
@@ -719,6 +723,112 @@ function logout(command: cli.ICommand): Promise<void> {
       sdk = null;
       deleteConnectionInfoCache();
     });
+}
+
+async function forgetPassword(command: cli.IForgetPasswordCommand) {
+  try {
+    if (!command.serverUrl || !command.apiKey) {
+      throw new Error("Server URL and API key are required.");
+    }
+    await requestResetToken(command.email, command.serverUrl, command.apiKey);
+    log(`A password reset link has been sent to ${command.email}.`);
+    log("");
+    const { token, newPassword } = await promptResetPassword();
+    const response = await superagent
+      .post(`${command.serverUrl}/auth/reset-password`)
+      .set("Content-Type", "application/json")
+      .set("X-Dev-Token", command.apiKey)
+      .send({ token, newPassword });
+
+    if (!response.body || response.status !== 200) {
+      throw new Error(response.body?.message || "Failed to reset password.");
+    }
+
+    log(chalk.green("✓ Password reset successful! You may now log in.\n"));
+
+    return response.body;
+  } catch (error: any) {
+    if (error.response && error.response.body) {
+      throw new Error(error.response.body.message);
+    }
+
+    throw new Error("An unexpected error occurred.");
+  }
+}
+
+async function requestResetToken(email: string, serverUrl: string, apiKey: string) {
+  try {
+    const response = await superagent
+      .post(`${serverUrl}/auth/request-reset-password`)
+      .set("Content-Type", "application/json")
+      .set("X-Dev-Token", apiKey)
+      .send({ email });
+
+    if (!response.body || response.status !== 200) {
+      throw new Error(response.body?.message || "Failed to request reset password.");
+    }
+
+    return response.body;
+  } catch (error: any) {
+    if (error.response && error.response.body) {
+      throw new Error(error.response.body.message);
+    }
+
+    throw new Error("An unexpected error occurred.");
+  }
+}
+
+
+function promptResetPassword(): Promise<{
+  token: string;
+  newPassword: string;
+  confirmPassword: string;
+}> {
+  return Promise((resolve, reject) => {
+    prompt.message = "";
+    prompt.delimiter = "";
+
+    prompt.start();
+    prompt.get(
+      {
+        properties: {
+          token: {
+            description: chalk.cyan("Please enter the reset token from the email:"),
+            required: true,
+          },
+          newPassword: {
+            description: chalk.cyan("Enter your new password:"),
+            hidden: true,
+            replace: "•",
+            required: true,
+          },
+          confirmPassword: {
+            description: chalk.cyan("Confirm your new password:"),
+            hidden: true,
+            replace: "•",
+            required: true,
+          },
+        },
+      },
+      (err: any, result: any): void => {
+        if (err) {
+          return reject(err);
+        }
+
+        const { token, newPassword, confirmPassword } = result;
+
+        if (newPassword !== confirmPassword) {
+          return reject(new Error("✖ Passwords do not match. Please try again."));
+        }
+
+        resolve({
+          token: token.trim(),
+          newPassword: newPassword.trim(),
+          confirmPassword: confirmPassword.trim(),
+        });
+      }
+    );
+  });
 }
 
 function organizationAdd(command: cli.IOrganizationCommand): Promise<void> {

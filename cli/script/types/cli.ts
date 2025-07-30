@@ -24,6 +24,7 @@ export enum CommandType {
   deploymentMetrics,
   deploymentRemove,
   deploymentRename,
+  forgetPassword,
   link,
   login,
   easyLogin,
@@ -155,6 +156,12 @@ export interface IDeploymentRenameCommand extends ICommand {
   currentDeploymentName: string;
   newDeploymentName: string;
   orgName: string;
+}
+
+export interface IForgetPasswordCommand extends ICommand {
+  email: string;
+  serverUrl?: string;
+  apiKey?: string;
 }
 
 export interface ILinkCommand extends ICommand {

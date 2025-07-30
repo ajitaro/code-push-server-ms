@@ -342,7 +342,10 @@ yargs
         yargs
           .usage(USAGE_PREFIX + " collaborator add <organization> <email>")
           .demand(/*count*/ 2, /*max*/ 2) // Require exactly two non-option arguments
-          .example("collaborator add Myorganization foo@bar.com", 'Adds foo@bar.com as a collaborator to organization "Myorganization"');
+          .example(
+            "collaborator add Myorganization foo@bar.com",
+            'Adds foo@bar.com as a collaborator to organization "Myorganization"'
+          );
 
         addCommonConfiguration(yargs);
       })
@@ -404,6 +407,24 @@ yargs
 
     addCommonConfiguration(yargs);
   })
+  .command("forget-password", "Send reset password email to a user", (yargs: yargs.Argv) => {
+    isValidCommandCategory = true;
+
+    yargs
+      .usage(USAGE_PREFIX + " forget-password <email>")
+      .demandCommand(1, 1) // Require exactly one argument
+      .example("forget-password user@example.com", "Sends a reset password email to user@example.com")
+      .check((argv) => {
+        const email = argv._[1]; // The first positional arg after command
+        if (!email || typeof email !== "string" || !email.includes("@")) {
+          throw new Error("You must provide a valid email address.");
+        }
+        return true;
+      });
+
+    addCommonConfiguration(yargs);
+  })
+
   .command("link", "Link an additional authentication provider (e.g. GitHub) to an existing CodePush account", (yargs: yargs.Argv) => {
     isValidCommandCategory = true;
     isValidCommand = true;
@@ -446,8 +467,7 @@ yargs
         alias: "p",
         default: null,
         demand: true,
-        description:
-          "Your account password",
+        description: "Your account password",
         type: "string",
       })
       .check((argv: any, aliases: { [aliases: string]: string }): any => isValidCommand); // Report unrecognized, non-hyphenated command category.
@@ -652,8 +672,7 @@ yargs
         alias: "p",
         default: null,
         demand: true,
-        description:
-          "Your account password",
+        description: "Your account password",
         type: "string",
       })
       .check((argv: any, aliases: { [aliases: string]: string }): any => isValidCommand); // Report unrecognized, non-hyphenated command category.
@@ -858,15 +877,14 @@ yargs
         alias: "pod",
         default: null,
         demand: false,
-        description:  "Path to the cocopods config file (iOS only).",
+        description: "Path to the cocopods config file (iOS only).",
         type: "string",
       })
       .option("extraHermesFlags", {
         alias: "hf",
         default: [],
         demand: false,
-        description:
-          "Flags that get passed to Hermes, JavaScript to bytecode compiler. Can be specified multiple times.",
+        description: "Flags that get passed to Hermes, JavaScript to bytecode compiler. Can be specified multiple times.",
         type: "array",
       })
       .option("privateKeyPath", {
@@ -887,14 +905,16 @@ yargs
         alias: "xt",
         default: undefined,
         demand: false,
-        description: "Name of target (PBXNativeTarget) which specifies the binary version you want to target this release at (iOS only)",
+        description:
+          "Name of target (PBXNativeTarget) which specifies the binary version you want to target this release at (iOS only)",
         type: "string",
       })
       .option("buildConfigurationName", {
         alias: "c",
         default: undefined,
         demand: false,
-        description: "Name of build configuration which specifies the binary version you want to target this release at. For example, 'Debug' or 'Release' (iOS only)",
+        description:
+          "Name of build configuration which specifies the binary version you want to target this release at. For example, 'Debug' or 'Release' (iOS only)",
         type: "string",
       })
       .check((argv: any, aliases: { [aliases: string]: string }): any => {
@@ -1196,6 +1216,19 @@ export function createCommand(): cli.ICommand {
             }
             break;
         }
+        break;
+
+      case "forget-password":
+        if (arg1) {
+          cmd = { type: cli.CommandType.forgetPassword };
+  
+          const forgetPasswordCommand = <cli.IForgetPasswordCommand>cmd;
+  
+          forgetPasswordCommand.email = arg1;
+          forgetPasswordCommand.serverUrl = getServerUrl(argv["serverUrl"] as any);
+          forgetPasswordCommand.apiKey = argv["apiKey"] as any;
+        }
+
         break;
 
       case "link":
