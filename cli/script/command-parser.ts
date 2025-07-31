@@ -407,24 +407,49 @@ yargs
 
     addCommonConfiguration(yargs);
   })
-  .command("forget-password", "Send reset password email to a user", (yargs: yargs.Argv) => {
+  .command("forget-password", "Reset a user password (send email or confirm with token)", (yargs: yargs.Argv) => {
     isValidCommandCategory = true;
 
     yargs
-      .usage(USAGE_PREFIX + " forget-password <email>")
-      .demandCommand(1, 1) // Require exactly one argument
-      .example("forget-password user@example.com", "Sends a reset password email to user@example.com")
-      .check((argv) => {
-        const email = argv._[1]; // The first positional arg after command
-        if (!email || typeof email !== "string" || !email.includes("@")) {
-          throw new Error("You must provide a valid email address.");
-        }
-        return true;
-      });
+      .usage(USAGE_PREFIX + " forget-password <command>")
+      .demand(2, 3) // Allow 2 or 3 arguments (command + args)
+      .command("email", "Send reset password email", (yargs: yargs.Argv) => {
+        isValidCommand = true;
+        yargs
+          .usage(USAGE_PREFIX + " forget-password email <email>")
+          .demand(1, 1)
+          .example("forget-password email user@example.com", "Sends a reset password email")
+          .check((argv) => {
+            const email = argv._[2]; // after "forget-password email"
+            if (!email || typeof email !== "string" || !email.includes("@")) {
+              throw new Error("You must provide a valid email address.");
+            }
+            return true;
+          });
+
+        addCommonConfiguration(yargs);
+      })
+      .command("token", "Submit token + new password", (yargs: yargs.Argv) => {
+        isValidCommand = true;
+        yargs
+          .usage(USAGE_PREFIX + " forget-password token <token> <newPassword>")
+          .demand(2, 2)
+          .example("forget-password token abc123 newPass123", "Confirm password reset using token and new password")
+          .check((argv) => {
+            const token = argv._[2];
+            const newPassword = argv._[3];
+            if (!token || !newPassword) {
+              throw new Error("You must provide both token and new password.");
+            }
+            return true;
+          });
+
+        addCommonConfiguration(yargs);
+      })
+      .check(() => isValidCommand); // to catch invalid subcommands
 
     addCommonConfiguration(yargs);
   })
-
   .command("link", "Link an additional authentication provider (e.g. GitHub) to an existing CodePush account", (yargs: yargs.Argv) => {
     isValidCommandCategory = true;
     isValidCommand = true;
@@ -1219,16 +1244,32 @@ export function createCommand(): cli.ICommand {
         break;
 
       case "forget-password":
-        if (arg1) {
-          cmd = { type: cli.CommandType.forgetPassword };
+        switch (arg1) {
+          case "email":
+            if (arg2) {
+              cmd = { type: cli.CommandType.requestResetToken };
   
-          const forgetPasswordCommand = <cli.IForgetPasswordCommand>cmd;
+              const requestResetTokenCommand = <cli.IRequestResetTokenCommand>cmd;
   
-          forgetPasswordCommand.email = arg1;
-          forgetPasswordCommand.serverUrl = getServerUrl(argv["serverUrl"] as any);
-          forgetPasswordCommand.apiKey = argv["apiKey"] as any;
+              requestResetTokenCommand.email = arg2;
+              requestResetTokenCommand.serverUrl = getServerUrl(argv["serverUrl"] as any);
+              requestResetTokenCommand.apiKey = argv["apiKey"] as any;
+            }
+            break;
+  
+          case "token":
+            if (arg2 && arg3) {
+              cmd = { type: cli.CommandType.forgetPassword };
+  
+              const forgetPasswordCommand = <cli.IForgetPasswordCommand>cmd;
+  
+              forgetPasswordCommand.token = arg2;
+              forgetPasswordCommand.newPassword = arg3;
+              forgetPasswordCommand.serverUrl = getServerUrl(argv["serverUrl"] as any);
+              forgetPasswordCommand.apiKey = argv["apiKey"] as any;
+            }
+            break;
         }
-
         break;
 
       case "link":

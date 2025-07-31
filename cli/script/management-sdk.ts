@@ -284,12 +284,13 @@ public getToken(account: string, password: string): Promise<ResToken> {
     return this.get(urlEncode([`/apps/${orgName}/collaborators`])).then((res: JsonResponse) => res.body.collaborators);
   }
 
-  public addCollaborator(email: string, orgName: string): Promise<void> {
+  public addCollaborator(email: string, orgName: string, role: string): Promise<void> {
     return this.post(
-      urlEncode([`/apps/${orgName}/collaborators/${email}`]),
-      /*requestBody=*/ null,
+      urlEncode([`/apps/${orgName}/collaborators`]),
+      /*requestBody=*/
+      JSON.stringify({ email: email, role: role }),
       /*expectResponseBody=*/ false
-    ).then(() => null);
+    ).then((res: JsonResponse) => null);
   }
 
   public removeCollaborator(email: string, orgName: string): Promise<void> {

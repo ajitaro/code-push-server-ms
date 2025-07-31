@@ -446,6 +446,7 @@ export function execute(command: cli.ICommand) {
       case cli.CommandType.register:
       case cli.CommandType.easyLogin:
       case cli.CommandType.easyRegister:
+      case cli.CommandType.requestResetToken:
       case cli.CommandType.forgetPassword:
         if (connectionInfo) {
           throw new Error("You are already logged in from this machine.");
@@ -527,6 +528,9 @@ export function execute(command: cli.ICommand) {
 
       case cli.CommandType.deploymentRename:
         return deploymentRename(<cli.IDeploymentRenameCommand>command);
+
+      case cli.CommandType.requestResetToken:
+        return requestResetToken(<cli.IRequestResetTokenCommand>command);
 
       case cli.CommandType.forgetPassword:
         return forgetPassword(<cli.IForgetPasswordCommand>command);
@@ -730,15 +734,12 @@ async function forgetPassword(command: cli.IForgetPasswordCommand) {
     if (!command.serverUrl || !command.apiKey) {
       throw new Error("Server URL and API key are required.");
     }
-    await requestResetToken(command.email, command.serverUrl, command.apiKey);
-    log(`A password reset link has been sent to ${command.email}.`);
-    log("");
-    const { token, newPassword } = await promptResetPassword();
+    // const { token, newPassword } = await promptResetPassword();
     const response = await superagent
       .post(`${command.serverUrl}/auth/reset-password`)
       .set("Content-Type", "application/json")
       .set("X-Dev-Token", command.apiKey)
-      .send({ token, newPassword });
+      .send({ token: command.token, newPassword: command.newPassword });
 
     if (!response.body || response.status !== 200) {
       throw new Error(response.body?.message || "Failed to reset password.");
@@ -756,17 +757,19 @@ async function forgetPassword(command: cli.IForgetPasswordCommand) {
   }
 }
 
-async function requestResetToken(email: string, serverUrl: string, apiKey: string) {
+async function requestResetToken(command: cli.IRequestResetTokenCommand) {
   try {
     const response = await superagent
-      .post(`${serverUrl}/auth/request-reset-password`)
+      .post(`${command.serverUrl}/auth/request-reset-password`)
       .set("Content-Type", "application/json")
-      .set("X-Dev-Token", apiKey)
-      .send({ email });
+      .set("X-Dev-Token", command.apiKey)
+      .send({ email: command.email });
 
     if (!response.body || response.status !== 200) {
       throw new Error(response.body?.message || "Failed to request reset password.");
     }
+
+    log(chalk.green(`✓ Password reset token sent to ${command.email} successfully.\n`));
 
     return response.body;
   } catch (error: any) {

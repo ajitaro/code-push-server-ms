@@ -24,6 +24,7 @@ export enum CommandType {
   deploymentMetrics,
   deploymentRemove,
   deploymentRename,
+  requestResetToken,
   forgetPassword,
   link,
   login,
@@ -158,8 +159,15 @@ export interface IDeploymentRenameCommand extends ICommand {
   orgName: string;
 }
 
-export interface IForgetPasswordCommand extends ICommand {
+export interface IRequestResetTokenCommand extends ICommand {
   email: string;
+  serverUrl?: string;
+  apiKey?: string;
+}
+
+export interface IForgetPasswordCommand extends ICommand {
+  token: string;
+  newPassword: string;
   serverUrl?: string;
   apiKey?: string;
 }
