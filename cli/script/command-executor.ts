@@ -245,7 +245,7 @@ function appTransfer(command: cli.IAppTransferCommand): Promise<void> {
 function addCollaborator(command: cli.ICollaboratorAddCommand): Promise<void> {
   throwForInvalidEmail(command.email);
 
-  return sdk.addCollaborator(command.email, command.orgName).then((): void => {
+  return sdk.addCollaborator(command.email, command.orgName, command.role).then((): void => {
     log('Successfully added "' + command.email + '" as a collaborator to the app "' + command.orgName + '".');
   });
 }

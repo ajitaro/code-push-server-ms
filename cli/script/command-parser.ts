@@ -340,12 +340,19 @@ yargs
       .command("add", "Add a new collaborator to an app", (yargs: yargs.Argv): void => {
         isValidCommand = true;
         yargs
-          .usage(USAGE_PREFIX + " collaborator add <organization> <email>")
+          .usage(USAGE_PREFIX + " collaborator add <organization> <email> [options]")
           .demand(/*count*/ 2, /*max*/ 2) // Require exactly two non-option arguments
           .example(
-            "collaborator add Myorganization foo@bar.com",
-            'Adds foo@bar.com as a collaborator to organization "Myorganization"'
-          );
+            "collaborator add Myorganization foo@bar.com --role admin",
+            'Adds foo@bar.com as a collaborator to organization "Myorganization" with role "admin"'
+          )
+          .option("role", {
+            alias: "r",
+            default: null,
+            demand: true,
+            description: "Role of the collaborator",
+            type: "string",
+          })
 
         addCommonConfiguration(yargs);
       })
@@ -1126,6 +1133,7 @@ export function createCommand(): cli.ICommand {
 
               collaboratorAddCommand.orgName = arg2;
               collaboratorAddCommand.email = arg3;
+              collaboratorAddCommand.role = argv["role"] as any;
             }
             break;
 

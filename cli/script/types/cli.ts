@@ -100,6 +100,7 @@ export interface ICollaboratorAddCommand extends ICommand {
   appName: string;
   email: string;
   orgName: string;
+  role: string;
 }
 
 export interface ICollaboratorListCommand extends ICommand {
