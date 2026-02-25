@@ -253,6 +253,7 @@ export interface IReleaseReactCommand extends IReleaseBaseCommand {
   xcodeProjectFile?: string;
   xcodeTargetName?: string;
   buildConfigurationName?: string;
+  reactNativePath?: string;
 }
 
 export interface IRollbackCommand extends ICommand {

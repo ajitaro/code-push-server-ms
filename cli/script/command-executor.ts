@@ -279,7 +279,7 @@ function deleteConnectionInfoCache(printMessage: boolean = true): void {
     if (printMessage) {
       log(`Successfully logged-out. The session file located at ${chalk.cyan(configFilePath)} has been deleted.\r\n`);
     }
-  } catch (ex) {}
+  } catch (ex) { }
 }
 
 function deleteFolder(folderPath: string): Promise<void> {
@@ -298,12 +298,12 @@ function deploymentAdd(command: cli.IDeploymentAddCommand): Promise<void> {
   return sdk.addDeployment(command.appName, command.deploymentName, command.orgName).then((deployment: Deployment): void => {
     log(
       'Successfully added the "' +
-        command.deploymentName +
-        '" deployment with key "' +
-        deployment.key +
-        '" to the "' +
-        command.appName +
-        '" app.'
+      command.deploymentName +
+      '" deployment with key "' +
+      deployment.key +
+      '" to the "' +
+      command.appName +
+      '" app.'
     );
   });
 }
@@ -314,10 +314,10 @@ function deploymentHistoryClear(command: cli.IDeploymentHistoryClearCommand): Pr
       return sdk.clearDeploymentHistory(command.appName, command.deploymentName, command.orgName).then((): void => {
         log(
           'Successfully cleared the release history associated with the "' +
-            command.deploymentName +
-            '" deployment from the "' +
-            command.appName +
-            '" app.'
+          command.deploymentName +
+          '" deployment from the "' +
+          command.appName +
+          '" app.'
         );
       });
     }
@@ -380,12 +380,12 @@ function deploymentRename(command: cli.IDeploymentRenameCommand): Promise<void> 
   return sdk.renameDeployment(command.appName, command.currentDeploymentName, command.newDeploymentName, command.orgName).then((): void => {
     log(
       'Successfully renamed the "' +
-        command.currentDeploymentName +
-        '" deployment to "' +
-        command.newDeploymentName +
-        '" for the "' +
-        command.appName +
-        '" app.'
+      command.currentDeploymentName +
+      '" deployment to "' +
+      command.newDeploymentName +
+      '" for the "' +
+      command.appName +
+      '" app.'
     );
   });
 }
@@ -674,7 +674,7 @@ async function easyLogin(command: cli.IEasyAuthCommand) {
     const accessKey = await addAccessKey(command.serverUrl, command.email, token, undefined, apiKey);
     const newSdk = getSdk(accessKey.key!, headers, command.serverUrl!, command.apiKey!);
     const isAuthenticated = await newSdk.isAuthenticated();
-    
+
     if (isAuthenticated) {
       serializeConnectionInfo(accessKey.key!, /*preserveAccessKeyOnLogout*/ true, command.serverUrl, command.email, apiKey);
     } else {
@@ -692,7 +692,7 @@ async function easyRegister(command: cli.IEasyAuthCommand) {
       .set("Content-Type", "application/json")
       .set("X-Dev-Token", command.apiKey)
       .send({ email: command.email, password: command.password });
-      
+
     if (!response.body || response.status !== 200) {
       throw new Error(response.body?.message || "Failed to register.");
     }
@@ -846,7 +846,7 @@ function organizationList(): Promise<void> {
       if (!isAuth) {
         throw new Error("Not authenticated.");
       }
-      
+
       return sdk.getOrganizations().then((organizations: Organization[]): void => {
         printTable(["No", "Name"], (dataSource: any[]): void => {
           organizations.forEach((org: Organization, index: number) => {
@@ -1398,14 +1398,14 @@ function promote(command: cli.IPromoteCommand): Promise<void> {
     .then((): void => {
       log(
         "Successfully promoted " +
-          (command.label !== null ? '"' + command.label + '" of ' : "") +
-          'the "' +
-          command.sourceDeploymentName +
-          '" deployment of the "' +
-          command.appName +
-          '" app to the "' +
-          command.destDeploymentName +
-          '" deployment.'
+        (command.label !== null ? '"' + command.label + '" of ' : "") +
+        'the "' +
+        command.sourceDeploymentName +
+        '" deployment of the "' +
+        command.appName +
+        '" app to the "' +
+        command.destDeploymentName +
+        '" deployment.'
       );
     })
     .catch((err: CodePushError) => releaseErrorHandler(err, command));
@@ -1424,8 +1424,7 @@ function patch(command: cli.IPatchCommand): Promise<void> {
     if ((<any>packageInfo)[updateProperty] !== null) {
       return sdk.patchRelease(command.appName, command.deploymentName, command.label, packageInfo, command.orgName).then((): void => {
         log(
-          `Successfully updated the "${command.label ? command.label : `latest`}" release of "${command.appName}" app's "${
-            command.deploymentName
+          `Successfully updated the "${command.label ? command.label : `latest`}" release of "${command.appName}" app's "${command.deploymentName
           }" deployment.`
         );
       });
@@ -1471,7 +1470,7 @@ export const release = (command: cli.IReleaseCommand): Promise<void> => {
   };
 
   log(chalk.cyan(`\Uploading package..., ${filePath}\n`));
-  
+
   return sdk
     .isAuthenticated(true)
     .then((isAuth: boolean): Promise<void> => {
@@ -1480,14 +1479,14 @@ export const release = (command: cli.IReleaseCommand): Promise<void> => {
     .then((): void => {
       log(
         'Successfully released an update containing the "' +
-          command.package +
-          '" ' +
-          (isSingleFilePackage ? "file" : "directory") +
-          ' to the "' +
-          command.deploymentName +
-          '" deployment of the "' +
-          command.appName +
-          '" app.'
+        command.package +
+        '" ' +
+        (isSingleFilePackage ? "file" : "directory") +
+        ' to the "' +
+        command.deploymentName +
+        '" deployment of the "' +
+        command.appName +
+        '" app.'
       );
     })
     .catch((err: CodePushError) => releaseErrorHandler(err, command));
@@ -1579,14 +1578,15 @@ export const releaseReact = (command: cli.IReleaseReactCommand): Promise<void> =
           entryFile,
           outputFolder,
           platform,
-          command.sourcemapOutput
+          command.sourcemapOutput,
+          command.reactNativePath
         )
       )
       .then(async () => {
         const isHermesEnabled =
-        command.useHermes ||
-        (platform === "android" && (await getAndroidHermesEnabled(command.gradleFile))) || // Check if we have to run hermes to compile JS to Byte Code if Hermes is enabled in build.gradle and we're releasing an Android build
-        (platform === "ios" && (await getiOSHermesEnabled(command.podFile))); // Check if we have to run hermes to compile JS to Byte Code if Hermes is enabled in Podfile and we're releasing an iOS build
+          command.useHermes ||
+          (platform === "android" && (await getAndroidHermesEnabled(command.gradleFile))) || // Check if we have to run hermes to compile JS to Byte Code if Hermes is enabled in build.gradle and we're releasing an Android build
+          (platform === "ios" && (await getiOSHermesEnabled(command.podFile))); // Check if we have to run hermes to compile JS to Byte Code if Hermes is enabled in Podfile and we're releasing an iOS build
 
         if (isHermesEnabled) {
           log(chalk.cyan("\nRunning hermes compiler...\n"));
@@ -1729,7 +1729,8 @@ export const runReactNativeBundleCommand = (
   entryFile: string,
   outputFolder: string,
   platform: string,
-  sourcemapOutput: string
+  sourcemapOutput?: string,
+  reactNativePath?: string
 ): Promise<void> => {
   const reactNativeBundleArgs: string[] = [];
   const envNodeArgs: string = process.env.CODE_PUSH_NODE_ARGS;
@@ -1740,8 +1741,10 @@ export const runReactNativeBundleCommand = (
 
   const isOldCLI = fs.existsSync(path.join("node_modules", "react-native", "local-cli", "cli.js"));
 
+  const cliPath = reactNativePath || (isOldCLI ? path.join("node_modules", "react-native", "local-cli", "cli.js") : path.join("node_modules", "react-native", "cli.js"));
+
   Array.prototype.push.apply(reactNativeBundleArgs, [
-    isOldCLI ? path.join("node_modules", "react-native", "local-cli", "cli.js") : path.join("node_modules", "react-native", "cli.js"),
+    cliPath,
     "bundle",
     "--assets-dest",
     outputFolder,
@@ -1802,46 +1805,46 @@ function serializeConnectionInfo(accessKey: string, preserveAccessKeyOnLogout: b
 
   const json: string = JSON.stringify(connectionInfo);
   fs.writeFileSync(configFilePath, json, { encoding: "utf8" });
-  
+
   const projectRoot = process.cwd();
   const envFilePath = path.join(projectRoot, '../.env');
   console.log('.env File Path:', envFilePath);
-  
+
   const key = 'CODE_PUSH_ACCESS_KEY';
   let envContent = '';
-  
+
   // Read the existing .env file if it exists
   if (fs.existsSync(envFilePath)) {
-      envContent = fs.readFileSync(envFilePath, 'utf8');
+    envContent = fs.readFileSync(envFilePath, 'utf8');
   }
-  
+
   const lines = envContent.split('\n');
   let updated = false;
-  
+
   // Modify the existing key if found
   const newLines = lines.map(line => {
-      if (line.startsWith(`${key}=`)) {
-          if (line === `${key}=${accessKey}`) {
-              console.log(`${key} already exists with the same value, skipping.`);
-              updated = true; // Mark it as "handled"
-              return line; // Keep it unchanged
-          }
-          console.log(`Updating ${key} to new value: ${accessKey}`);
-          updated = true;
-          return `${key}=${accessKey}`;
+    if (line.startsWith(`${key}=`)) {
+      if (line === `${key}=${accessKey}`) {
+        console.log(`${key} already exists with the same value, skipping.`);
+        updated = true; // Mark it as "handled"
+        return line; // Keep it unchanged
       }
-      return line;
+      console.log(`Updating ${key} to new value: ${accessKey}`);
+      updated = true;
+      return `${key}=${accessKey}`;
+    }
+    return line;
   });
-  
+
   // If key is not found, append it
   if (!updated) {
-      console.log(`Appending new key: ${key}=${accessKey}`);
-      newLines.push(`${key}=${accessKey}`);
+    console.log(`Appending new key: ${key}=${accessKey}`);
+    newLines.push(`${key}=${accessKey}`);
   }
-  
+
   // Write the updated content back to .env
   fs.writeFileSync(envFilePath, newLines.join('\n'), 'utf8');
-  
+
   console.log('.env file updated successfully.');
 
   log(

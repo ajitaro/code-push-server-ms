@@ -713,18 +713,18 @@ yargs
   })
   .command("release", "Release an update to an app deployment", (yargs: yargs.Argv) => {
     yargs
-      .usage(USAGE_PREFIX + " release <appName> <updateContentsPath> <targetBinaryVersion> [options]")
-      .demand(/*count*/ 3, /*max*/ 3) // Require exactly three non-option arguments.
+      .usage(USAGE_PREFIX + " release <orgName> <appName> <updateContentsPath> <targetBinaryVersion> [options]")
+      .demand(/*count*/ 4, /*max*/ 4) // Require exactly three non-option arguments.
       .example(
-        'release MyApp app.js "*"',
+        'release MyOrganization MyApp app.js "*"',
         'Releases the "app.js" file to the "MyApp" app\'s "Staging" deployment, targeting any binary version using the "*" wildcard range syntax.'
       )
       .example(
-        "release MyApp ./platforms/ios/www 1.0.3 -d Production",
+        "release MyOrganization MyApp ./platforms/ios/www 1.0.3 -d Production",
         'Releases the "./platforms/ios/www" folder and all its contents to the "MyApp" app\'s "Production" deployment, targeting only the 1.0.3 binary version'
       )
       .example(
-        "release MyApp ./platforms/ios/www 1.0.3 -d Production -r 20",
+        "release MyOrganization MyApp ./platforms/ios/www 1.0.3 -d Production -r 20",
         'Releases the "./platforms/ios/www" folder and all its contents to the "MyApp" app\'s "Production" deployment, targeting the 1.0.3 binary version and rolling out to about 20% of the users'
       )
       .option("deploymentName", {
@@ -947,6 +947,13 @@ yargs
         demand: false,
         description:
           "Name of build configuration which specifies the binary version you want to target this release at. For example, 'Debug' or 'Release' (iOS only)",
+        type: "string",
+      })
+      .option("reactNativePath", {
+        alias: "rnp",
+        default: null,
+        demand: false,
+        description: "Path to the react-native CLI executable.",
         type: "string",
       })
       .check((argv: any, aliases: { [aliases: string]: string }): any => {
@@ -1256,21 +1263,21 @@ export function createCommand(): cli.ICommand {
           case "email":
             if (arg2) {
               cmd = { type: cli.CommandType.requestResetToken };
-  
+
               const requestResetTokenCommand = <cli.IRequestResetTokenCommand>cmd;
-  
+
               requestResetTokenCommand.email = arg2;
               requestResetTokenCommand.serverUrl = getServerUrl(argv["serverUrl"] as any);
               requestResetTokenCommand.apiKey = argv["apiKey"] as any;
             }
             break;
-  
+
           case "token":
             if (arg2 && arg3) {
               cmd = { type: cli.CommandType.forgetPassword };
-  
+
               const forgetPasswordCommand = <cli.IForgetPasswordCommand>cmd;
-  
+
               forgetPasswordCommand.token = arg2;
               forgetPasswordCommand.newPassword = arg3;
               forgetPasswordCommand.serverUrl = getServerUrl(argv["serverUrl"] as any);
@@ -1326,7 +1333,7 @@ export function createCommand(): cli.ICommand {
           case "ls":
             cmd = { type: cli.CommandType.organizationList };
             break;
-          
+
           case "remove":
           case "rm":
             if (arg2) {
@@ -1384,7 +1391,7 @@ export function createCommand(): cli.ICommand {
 
         registerCommand.serverUrl = getServerUrl(arg1);
         break;
-      
+
       case "easy-register":
         cmd = { type: cli.CommandType.easyRegister };
 
@@ -1397,14 +1404,15 @@ export function createCommand(): cli.ICommand {
         break;
 
       case "release":
-        if (arg1 && arg2 && arg3) {
+        if (arg1 && arg2 && arg3 && arg4) {
           cmd = { type: cli.CommandType.release };
 
           const releaseCommand = <cli.IReleaseCommand>cmd;
 
-          releaseCommand.appName = arg1;
-          releaseCommand.package = arg2;
-          releaseCommand.appStoreVersion = arg3;
+          releaseCommand.orgName = arg1;
+          releaseCommand.appName = arg2;
+          releaseCommand.package = arg3;
+          releaseCommand.appStoreVersion = arg4;
           releaseCommand.deploymentName = argv["deploymentName"] as any;
           releaseCommand.description = argv["description"] ? backslash(argv["description"]) : "";
           releaseCommand.disabled = argv["disabled"] as any;
@@ -1446,6 +1454,7 @@ export function createCommand(): cli.ICommand {
           releaseReactCommand.xcodeProjectFile = argv["xcodeProjectFile"] as any;
           releaseReactCommand.xcodeTargetName = argv["xcodeTargetName"] as any;
           releaseReactCommand.buildConfigurationName = argv["buildConfigurationName"] as any;
+          releaseReactCommand.reactNativePath = argv["reactNativePath"] as any;
         }
         break;
 
