@@ -1609,6 +1609,32 @@ export const releaseReact = (command: cli.IReleaseReactCommand): Promise<void> =
       })
       .then(() => {
         log(chalk.cyan("\nReleasing update contents to CodePush:\n"));
+        try {
+          let size = 0;
+          const getDirSize = (dir: string) => {
+            const files = fs.readdirSync(dir);
+            for (const file of files) {
+              const filePath = path.join(dir, file);
+              const stats = fs.statSync(filePath);
+              if (stats.isDirectory()) {
+                getDirSize(filePath);
+              } else {
+                size += stats.size;
+              }
+            }
+          };
+          getDirSize(outputFolder);
+          
+          let sizeStr = size + " B";
+          if (size > 1024 * 1024) {
+            sizeStr = (size / (1024 * 1024)).toFixed(2) + " MB";
+          } else if (size > 1024) {
+            sizeStr = (size / 1024).toFixed(2) + " KB";
+          }
+          log(chalk.cyan(`Codepush file size: ${sizeStr}\n`));
+        } catch (err) {
+          log(chalk.yellow(`Could not calculate codepush size: ${err}\n`));
+        }
         return release(releaseCommand);
       })
       .then(() => {
